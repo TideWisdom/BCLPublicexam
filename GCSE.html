@@ -524,7 +524,7 @@
         <div class="exercise-config-box">
             <div class="config-grid">
                 <label>練習類型:
-                    <select id="practice-type">
+                    <select id="practice-type" onchange="toggleSourceConfig()">
                         <option value="choice">選擇題 (多選一)</option>
                         <option value="drag">拖曳配對</option>
                         <option value="hybrid">混合模式 (選擇題 + 拖曳)</option>
@@ -538,12 +538,15 @@
                     </select>
                 </label>
                 <label>範圍選擇:
-                    <select id="practice-source">
+                    <select id="practice-source" onchange="toggleSourceConfig()">
                         <option value="all">全部詞庫</option>
                         <option value="category">按主分類篩選</option>
                         <option value="subcategory">按子分類篩選</option>
                         <option value="custom">自選（已勾選項目）</option>
                     </select>
+                </label>
+                <label>每組題數:
+                    <input type="number" id="practice-count" value="10" min="1" max="50">
                 </label>
             </div>
 
@@ -670,7 +673,7 @@
     function parseSynonyms(text) {
         if (text === null || text === undefined) return [];
         let str = String(text);
-        let parts = str.split(/[\/、,，]|(?:\s*,\s*)|(?:\sand\s)/).map(s => s.trim()).filter(s => s.length > 0);
+        let parts = str.split(/[\/、,$,，]|(?:\s*,\s*)|(?:\sand\s)/).map(s => s.trim()).filter(s => s.length > 0);
         if (parts.length === 0) parts = [str.trim()];
         return parts;
     }
@@ -1689,61 +1692,68 @@
     function toggleSourceConfig() {
         const sourceEl = document.getElementById('practice-source');
         const container = document.getElementById('source-detail-container');
-        const practiceTypeEl = document.getElementById('practice-type');
-        if(!sourceEl || !container || !practiceTypeEl) return;
+        if(!sourceEl || !container) return;
 
         const source = sourceEl.value;
-        const practiceType = practiceTypeEl.value;
-        
         let html = '';
-        if(source === 'all') {
-            html = `<label>總題數設定: <input type="number" id="num-total" value="10" min="1" max="50" style="width:100px;"></label>`;
-        } else if(source === 'category') {
+
+        if(source === 'category') {
             html = `
-                <div style="display:flex; gap:15px; flex-wrap:wrap;">
-                    <label>選擇主分類: 
-                        <select id="config-category">
-                            <option value="Section 1: High-frequency language">Section 1: High-frequency language</option>
-                            <option value="Section 2: Topic-specific language">Section 2: Topic-specific language</option>
-                        </select>
-                    </label>
-                    <label>題數: <input type="number" id="num-category" value="10" min="1" max="50" style="width:80px;"></label>
+                <div>
+                    <span style="font-size:13px; font-weight:600; color:#334155;">選擇主分類 (可多選):</span>
+                    <div class="checkbox-group">
+                        <label><input type="checkbox" name="practice-cat" value="Section 1: High-frequency language" checked> Section 1: High-frequency language</label>
+                        <label><input type="checkbox" name="practice-cat" value="Section 2: Topic-specific language" checked> Section 2: Topic-specific language</label>
+                    </div>
                 </div>`;
         } else if(source === 'subcategory') {
-            let allSubs = [...new Set(masterData.map(d => d.subcategory))];
-            let subOptions = allSubs.map(s => `<option value="${s}">${s}</option>`).join('');
+            let cats = [...new Set(masterData.map(d => d.category))];
+            let subHtml = '';
+            cats.forEach(cat => {
+                let subs = [...new Set(masterData.filter(d => d.category === cat).map(d => d.subcategory))];
+                let shortCat = cat.startsWith("Section 1") ? "Section 1" : "Section 2";
+                subHtml += `<div class="sub-section-header">${shortCat}</div>`;
+                subHtml += `<div class="checkbox-group" style="margin-bottom: 10px;">`;
+                subs.forEach(s => {
+                    subHtml += `<label><input type="checkbox" name="practice-sub" value="${s}" checked> ${s}</label>`;
+                });
+                subHtml += `</div>`;
+            });
+
             html = `
-                <div style="display:flex; gap:15px; flex-wrap:wrap;">
-                    <label>選擇子分類: 
-                        <select id="config-subcategory">${subOptions}</select>
-                    </label>
-                    <label>題數: <input type="number" id="num-subcategory" value="10" min="1" max="50" style="width:80px;"></label>
+                <div>
+                    <span style="font-size:13px; font-weight:600; color:#334155;">選擇子分類 (可多選):</span>
+                    <div style="max-height: 250px; overflow-y: auto; padding: 5px; border: 1px solid var(--border-color); border-radius: 8px; background: #fff;">
+                        ${subHtml}
+                    </div>
+                    <div style="margin-top: 8px; display: flex; gap: 10px;">
+                        <button type="button" class="secondary-btn" style="padding: 4px 10px; font-size: 12px;" onclick="toggleAllPracticeSubCheckboxes(true)">全選</button>
+                        <button type="button" class="secondary-btn" style="padding: 4px 10px; font-size: 12px;" onclick="toggleAllPracticeSubCheckboxes(false)">全不選</button>
+                    </div>
                 </div>`;
         } else if(source === 'custom') {
             html = `<p style="margin:0; font-size:14px; color:#1e293b;">將使用您在「字詞表」中勾選的字詞（目前已選 <strong>${selectedIds.size}</strong> 個）。若勾選不足請先至字詞表選取。</p>`;
         }
 
-        if(practiceType === 'hybrid') {
-            html += `
-                <div style="margin-top:15px; padding-top:10px; border-top:1px dashed #cbd5e1; display:flex; gap:15px; flex-wrap:wrap;">
-                    <label>選擇題題數: <input type="number" id="hybrid-choice-num" value="5" min="1" max="30" style="width:80px;"></label>
-                    <label>拖曳配對題數: <input type="number" id="hybrid-drag-num" value="5" min="1" max="30" style="width:80px;"></label>
-                </div>`;
-        }
-
         container.innerHTML = html;
+    }
+
+    function toggleAllPracticeSubCheckboxes(status) {
+        document.querySelectorAll('input[name="practice-sub"]').forEach(cb => cb.checked = status);
     }
 
     function generatePractice() {
         const typeEl = document.getElementById('practice-type');
         const dirEl = document.getElementById('practice-direction');
         const sourceEl = document.getElementById('practice-source');
+        const countEl = document.getElementById('practice-count');
         const container = document.getElementById('practice-container');
         if(!typeEl || !dirEl || !sourceEl || !container) return;
 
         const type = typeEl.value;
         const direction = dirEl.value;
         const source = sourceEl.value;
+        const totalCount = countEl ? parseInt(countEl.value) || 10 : 10;
         
         container.innerHTML = '';
         const feedbackEl = document.getElementById('practice-feedback');
@@ -1753,13 +1763,19 @@
         if(source === 'all') {
             pool = [...masterData];
         } else if(source === 'category') {
-            const catEl = document.getElementById('config-category');
-            const cat = catEl ? catEl.value : '';
-            pool = masterData.filter(d => d.category === cat);
+            const checkedCats = Array.from(document.querySelectorAll('input[name="practice-cat"]:checked')).map(cb => cb.value);
+            if(checkedCats.length === 0) {
+                alert('請至少勾選一個主分類！');
+                return;
+            }
+            pool = masterData.filter(d => checkedCats.includes(d.category));
         } else if(source === 'subcategory') {
-            const subEl = document.getElementById('config-subcategory');
-            const sub = subEl ? subEl.value : '';
-            pool = masterData.filter(d => d.subcategory === sub);
+            const checkedSubs = Array.from(document.querySelectorAll('input[name="practice-sub"]:checked')).map(cb => cb.value);
+            if(checkedSubs.length === 0) {
+                alert('請至少勾選一個子分類！');
+                return;
+            }
+            pool = masterData.filter(d => checkedSubs.includes(d.subcategory));
         } else if(source === 'custom') {
             pool = masterData.filter(d => selectedIds.has(d.id));
             if(pool.length === 0) {
@@ -1773,39 +1789,17 @@
             return;
         }
 
-        if(type === 'choice') {
-            let totalElem = document.getElementById('num-total');
-            let catElem = document.getElementById('num-category');
-            let subElem = document.getElementById('num-subcategory');
-            
-            let total = source === 'all' ? (totalElem ? parseInt(totalElem.value) || 10 : 10) : 
-                        (source === 'category' ? (catElem ? parseInt(catElem.value) || 10 : 10) : 
-                        (source === 'subcategory' ? (subElem ? parseInt(subElem.value) || 10 : 10) : pool.length));
-            pool.sort(() => 0.5 - Math.random());
-            currentQuestions = pool.slice(0, Math.min(total, pool.length));
-            renderChoiceQuestions(currentQuestions, direction);
-        } else if(type === 'drag') {
-            let totalElem = document.getElementById('num-total');
-            let catElem = document.getElementById('num-category');
-            let subElem = document.getElementById('num-subcategory');
+        pool.sort(() => 0.5 - Math.random());
+        let selectedPool = pool.slice(0, Math.min(totalCount, pool.length));
 
-            let total = source === 'all' ? (totalElem ? parseInt(totalElem.value) || 5 : 5) : 
-                        (source === 'category' ? (catElem ? parseInt(catElem.value) || 5 : 5) : 
-                        (source === 'subcategory' ? (subElem ? parseInt(subElem.value) || 5 : 5) : pool.length));
-            pool.sort(() => 0.5 - Math.random());
-            currentQuestions = pool.slice(0, Math.min(total, pool.length));
-            renderDragQuestions(currentQuestions, direction);
+        if(type === 'choice') {
+            renderChoiceQuestions(selectedPool, direction);
+        } else if(type === 'drag') {
+            renderDragQuestions(selectedPool, direction);
         } else if(type === 'hybrid') {
-            let choiceElem = document.getElementById('hybrid-choice-num');
-            let dragElem = document.getElementById('hybrid-drag-num');
-            let choiceNum = choiceElem ? parseInt(choiceElem.value) || 5 : 5;
-            let dragNum = dragElem ? parseInt(dragElem.value) || 5 : 5;
-            pool.sort(() => 0.5 - Math.random());
-            
-            let choicePool = pool.slice(0, Math.min(choiceNum, pool.length));
-            let remainingPool = pool.slice(choicePool.length);
-            let dragPool = remainingPool.slice(0, Math.min(dragNum, remainingPool.length));
-            
+            let half = Math.ceil(selectedPool.length / 2);
+            let choicePool = selectedPool.slice(0, half);
+            let dragPool = selectedPool.slice(half);
             renderHybridQuestions(choicePool, dragPool, direction);
         }
 
