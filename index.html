@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="zh-HK">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>基礎中國語文公開試自習系統</title>
+    <style>
+        :root {
+            --primary-color: #2c3e50;
+            --accent-color: #3498db;
+            --bg-color: #f5f7fa;
+            --card-bg: #ffffff;
+            --text-color: #333333;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        .container {
+            background-color: var(--card-bg);
+            padding: 40px;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            width: 100%;
+            max-width: 500px;
+            box-sizing: border-box;
+        }
+
+        h2 {
+            text-align: center;
+            color: var(--primary-color);
+            margin-bottom: 30px;
+            font-size: 24px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: bold;
+            color: var(--primary-color);
+        }
+
+        select {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+            font-size: 16px;
+            background-color: #fff;
+            box-sizing: border-box;
+            transition: border-color 0.3s;
+        }
+
+        select:focus {
+            outline: none;
+            border-color: var(--accent-color);
+        }
+
+        .btn-submit {
+            width: 100%;
+            padding: 12px;
+            background-color: var(--accent-color);
+            color: white;
+            border: none;
+            border-radius: 6px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background-color 0.3s;
+            margin-top: 10px;
+        }
+
+        .btn-submit:hover {
+            background-color: #2980b9;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h2>基礎中國語文公開試自習系統</h2>
+        
+        <form id="studyForm" onsubmit="navigateToPage(event)">
+            <div class="form-group">
+                <label for="examSelect">選擇考試課程：</label>
+                <select id="examSelect" required>
+                    <option value="" disabled selected>-- 請選擇考試課程 --</option>
+                    <option value="gce">GCE</option>
+                    <option value="gcse">GCSE</option>
+                </select>
+            </div>
+
+            <button type="submit" class="btn-submit">進入自習</button>
+        </form>
+    </div>
+
+    <script>
+        function navigateToPage(event) {
+            // 阻止表單預設提交行為
+            event.preventDefault();
+
+            const exam = document.getElementById('examSelect').value;
+
+            if (!exam) {
+                alert('請選擇考試課程！');
+                return;
+            }
+
+            // 根據選擇組合檔名：gce.html 或 gcse.html
+            const fileName = `${exam}.html`;
+
+            // 導向對應的頁面
+            window.location.href = fileName;
+        }
+    </script>
+
+</body>
+</html>
