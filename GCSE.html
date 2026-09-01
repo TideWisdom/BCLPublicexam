@@ -1,0 +1,2397 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GCSE自習系統</title>
+    <style>
+        :root {
+            --primary: #4f46e5;
+            --primary-hover: #4338ca;
+            --secondary: #0ea5e9;
+            --success: #10b981;
+            --danger: #ef4444;
+            --warning: #f59e0b;
+            --bg-color: #f8fafc;
+            --card-bg: #ffffff;
+            --text-color: #1e293b;
+            --border-color: #e2e8f0;
+            
+            --sec1-color: #1d4ed8;
+            --sec1-bg: #eff6ff;
+            --sec1-border: #bfdbfe;
+
+            --sec2-color: #047857;
+            --sec2-bg: #ecfdf5;
+            --sec2-border: #a7f3d0;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            margin: 0;
+            padding: 20px;
+            line-height: 1.5;
+        }
+
+        .container {
+            max-width: 1300px;
+            margin: 0 auto;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 25px;
+            position: relative;
+        }
+
+        header h1 {
+            color: #1e1b4b;
+            margin-bottom: 5px;
+            font-size: 2rem;
+        }
+
+        header p {
+            color: #64748b;
+            font-size: 1rem;
+        }
+
+        .home-btn {
+            position: absolute;
+            left: 0;
+            top: 50%;
+            transform: translateY(-50%);
+            background-color: #64748b;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 14px;
+            text-decoration: none;
+            transition: background-color 0.2s;
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .home-btn:hover {
+            background-color: #475569;
+        }
+
+        @media (max-width: 768px) {
+            header {
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+            }
+            .home-btn {
+                position: static;
+                transform: none;
+                margin-bottom: 15px;
+            }
+        }
+
+        .tabs {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 25px;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+
+        .tab-btn {
+            padding: 12px 24px;
+            background-color: #e2e8f0;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 600;
+            color: #475569;
+            transition: all 0.2s ease;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+        }
+
+        .tab-btn.active {
+            background-color: var(--primary);
+            color: white;
+            box-shadow: 0 4px 6px -1px rgba(79, 70, 229, 0.3);
+        }
+
+        .section {
+            display: none;
+            background: var(--card-bg);
+            padding: 30px;
+            border-radius: 16px;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.05), 0 4px 6px -4px rgba(0, 0, 0, 0.05);
+            margin-bottom: 30px;
+        }
+
+        .section.active {
+            display: block;
+            animation: fadeIn 0.3s ease-in-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(6px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        h2 {
+            margin-top: 0;
+            color: #1e1b4b;
+            font-size: 1.5rem;
+            border-bottom: 2px solid #f1f5f9;
+            padding-bottom: 12px;
+            margin-bottom: 20px;
+        }
+
+        .controls {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            margin-bottom: 25px;
+            align-items: center;
+            background: #f8fafc;
+            padding: 20px;
+            border-radius: 12px;
+            border: 1px solid var(--border-color);
+        }
+
+        .controls label {
+            font-weight: 600;
+            font-size: 14px;
+            color: #334155;
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+
+        .controls select, .controls button, .controls input {
+            padding: 10px 14px;
+            font-size: 14px;
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            background-color: white;
+            color: #334155;
+            outline: none;
+            transition: border-color 0.2s;
+        }
+
+        .controls select:focus, .controls input:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
+        }
+
+        button.action-btn {
+            background-color: var(--primary);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: background-color 0.2s;
+        }
+
+        button.action-btn:hover {
+            background-color: var(--primary-hover);
+        }
+
+        button.secondary-btn {
+            background-color: #64748b;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+        }
+
+        button.secondary-btn:hover {
+            background-color: #475569;
+        }
+
+        .table-responsive {
+            max-height: 550px;
+            overflow-y: auto;
+            border-radius: 8px;
+            border: 1px solid var(--border-color);
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            text-align: left;
+            background: white;
+        }
+
+        th, td {
+            padding: 14px 16px;
+            border-bottom: 1px solid var(--border-color);
+            font-size: 14px;
+        }
+
+        th {
+            background-color: #f1f5f9;
+            color: #334155;
+            font-weight: 600;
+            position: sticky;
+            top: 0;
+            z-index: 10;
+        }
+
+        tr:hover {
+            background-color: #f8fafc;
+        }
+
+        .exercise-config-box {
+            background: #ffffff;
+            border: 1px solid var(--border-color);
+            padding: 20px;
+            border-radius: 12px;
+            margin-bottom: 25px;
+        }
+
+        .config-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 15px;
+            margin-bottom: 15px;
+        }
+
+        .question-card {
+            background: #fff;
+            border: 1px solid var(--border-color);
+            padding: 20px;
+            margin-bottom: 20px;
+            border-radius: 10px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.02);
+            border-left: 5px solid var(--primary);
+        }
+
+        .question-card p {
+            margin-top: 0;
+            font-size: 16px;
+            font-weight: 600;
+            color: #1e293b;
+        }
+
+        .drag-container {
+            display: flex;
+            gap: 20px;
+            justify-content: space-between;
+            margin-top: 15px;
+            flex-wrap: wrap;
+        }
+
+        .drag-list, .drop-list {
+            flex: 1;
+            min-width: 280px;
+            min-height: 350px;
+            background: #f8fafc;
+            padding: 15px;
+            border: 2px dashed #cbd5e1;
+            border-radius: 10px;
+        }
+
+        .draggable-item {
+            background: white;
+            padding: 12px;
+            margin-bottom: 10px;
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            cursor: grab;
+            font-weight: 500;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+            transition: transform 0.1s, box-shadow 0.1s;
+        }
+
+        .draggable-item:active {
+            cursor: grabbing;
+            transform: scale(0.98);
+        }
+
+        .drop-target {
+            padding: 10px;
+            margin-bottom: 12px;
+            background: #fff;
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            min-height: 45px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .drop-target.hovered {
+            background-color: #e0e7ff;
+            border-color: var(--primary);
+        }
+
+        .feedback {
+            margin-top: 15px;
+            font-weight: 600;
+            padding: 10px 15px;
+            border-radius: 6px;
+            background: #f1f5f9;
+        }
+
+        .dictation-input {
+            padding: 8px 12px;
+            font-size: 16px;
+            width: 260px;
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 3px 8px;
+            font-size: 11px;
+            font-weight: 600;
+            border-radius: 4px;
+        }
+
+        .badge-sec1-main {
+            background-color: var(--sec1-color);
+            color: #ffffff;
+        }
+        .badge-sec1-sub {
+            background-color: var(--sec1-bg);
+            color: var(--sec1-color);
+            border: 1px solid var(--sec1-border);
+        }
+
+        .badge-sec2-main {
+            background-color: var(--sec2-color);
+            color: #ffffff;
+        }
+        .badge-sec2-sub {
+            background-color: var(--sec2-bg);
+            color: var(--sec2-color);
+            border: 1px solid var(--sec2-border);
+        }
+
+        .badge-sub-neutral {
+            background-color: #f1f5f9;
+            color: #475569;
+            border: 1px solid #cbd5e1;
+        }
+
+        .checkbox-group {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            background: #f8fafc;
+            padding: 12px 16px;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            margin-top: 5px;
+        }
+
+        .checkbox-group label {
+            font-weight: normal;
+            flex-direction: row;
+            align-items: center;
+            gap: 6px;
+            cursor: pointer;
+        }
+
+        .notice-banner {
+            background-color: #fffbeb;
+            border: 1px solid #fef3c7;
+            color: #92400e;
+            padding: 12px 18px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .export-buttons {
+            display: flex;
+            gap: 10px;
+            margin-top: 15px;
+        }
+
+        .checkbox-cell {
+            text-align: center;
+            width: 40px;
+        }
+
+        .sub-section-header {
+            font-weight: bold;
+            background-color: #f1f5f9;
+            color: #334155;
+            padding: 8px 12px;
+            margin-top: 10px;
+            margin-bottom: 5px;
+            border-radius: 4px;
+        }
+
+        .toggle-btn {
+            background: none;
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+            cursor: pointer;
+            padding: 2px 6px;
+            font-size: 11px;
+            color: #64748b;
+            margin-left: 5px;
+            transition: all 0.2s;
+        }
+        .toggle-btn:hover {
+            background-color: #e2e8f0;
+            color: var(--text-color);
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <header>
+        <a href="BCLf401.html" class="home-btn">← 回到主頁</a>
+        <h1>GCSE 自習系統</h1>
+        <p>Pearson Edexcel GCSE (9-1) Chinese Vocabulary Revision</p>
+    </header>
+    
+    <div class="tabs">
+        <button class="tab-btn active" onclick="switchTab(event, 'wordlist-section')">1. 字詞表與自選</button>
+        <button class="tab-btn" onclick="switchTab(event, 'practice-section')">2. 互動練習中心</button>
+        <button class="tab-btn" onclick="switchTab(event, 'dictation-section')">3. 默書模式</button>
+        <button class="tab-btn" onclick="switchTab(event, 'wrong-book-section')">4. 錯題簿與匯出 (<span id="wrong-count">0</span>)</button>
+    </div>
+
+    <!-- 1. 字詞表專區 -->
+    <div id="wordlist-section" class="section active">
+        <h2>字詞表</h2>
+        <div class="controls">
+            <label>分類篩選： 
+                <select id="category-filter" onchange="onCategoryFilterChange()">
+                    <option value="all">全部類別</option>
+                    <option value="Section 1: High-frequency language">Section 1: High-frequency language</option>
+                    <option value="Section 2: Topic-specific language">Section 2: Topic-specific language</option>
+                </select>
+            </label>
+            <label>子分類篩選: 
+                <select id="subcategory-filter" onchange="filterWordList()">
+                    <option value="all">全部子分類</option>
+                </select>
+            </label>
+            <label>關鍵字搜尋:
+                <input type="text" id="search-input" placeholder="輸入中文或英文..." onkeyup="filterWordList()">
+            </label>
+            <button class="secondary-btn" onclick="selectAllFiltered(true)">全選篩選結果</button>
+            <button class="secondary-btn" onclick="selectAllFiltered(false)">取消全選</button>
+        </div>
+        <p style="font-size: 13px; color: #64748b; margin-top: -10px; margin-bottom: 15px;">
+            提示：您可以在表格左側勾選特定字詞，然後在「互動練習」或「默書模式」中選擇**「自選（已勾選項目）」**進行針對性訓練！已選 <span id="selected-count" style="font-weight:bold; color:var(--primary)">0</span> 個詞彙。
+        </p>
+        <div class="table-responsive">
+            <table id="word-table">
+                <thead>
+                    <tr id="word-table-header-row">
+                        <th class="checkbox-cell"><input type="checkbox" id="select-all-checkbox" onclick="toggleSelectAll(this)"></th>
+                        <th>編號</th>
+                        <th>中文詞彙 / 短語</th>
+                        <th>英文翻譯 (English Translation)</th>
+                        <th class="th-cat">
+                            主分類 
+                            <button class="toggle-btn" onclick="toggleColumn('cat')" title="隱藏/顯示主分類">👁️</button>
+                        </th>
+                        <th class="th-sub">
+                            子分類 
+                            <button class="toggle-btn" onclick="toggleColumn('sub')" title="隱藏/顯示子分類">👁️</button>
+                        </th>
+                    </tr>
+                </thead>
+                <tbody id="word-table-body">
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- 2. 互動練習專區 -->
+    <div id="practice-section" class="section">
+        <h2>互動練習中心</h2>
+        
+        <div class="exercise-config-box">
+            <div class="config-grid">
+                <label>練習類型:
+                    <select id="practice-type">
+                        <option value="choice">選擇題 (多選一)</option>
+                        <option value="drag">拖曳配對</option>
+                        <option value="hybrid">混合模式 (選擇題 + 拖曳)</option>
+                    </select>
+                </label>
+                <label>翻譯方向:
+                    <select id="practice-direction">
+                        <option value="cn-to-en">中譯英 (看中文選英文)</option>
+                        <option value="en-to-cn">英譯中 (看英文選中文)</option>
+                        <option value="random">混合方向 (隨機)</option>
+                    </select>
+                </label>
+                <label>範圍選擇:
+                    <select id="practice-source">
+                        <option value="all">全部詞庫</option>
+                        <option value="category">按主分類篩選</option>
+                        <option value="subcategory">按子分類篩選</option>
+                        <option value="custom">自選（已勾選項目）</option>
+                    </select>
+                </label>
+            </div>
+
+            <div id="source-detail-container" style="margin-top: 15px; padding-top: 15px; border-top: 1px dashed var(--border-color);">
+            </div>
+
+            <div style="margin-top: 20px; display: flex; gap: 15px; align-items: center;">
+                <button class="action-btn" onclick="generatePractice()">開始練習</button>
+                <span id="practice-info-text" style="font-size: 14px; color: #64748b;"></span>
+            </div>
+        </div>
+
+        <div id="practice-container">
+        </div>
+        <div id="practice-actions" style="display:none; margin-top: 20px;">
+            <button class="action-btn" onclick="checkPracticeAnswers()">提交批改答案</button>
+            <button class="secondary-btn" onclick="generatePractice()">生成另一組新練習</button>
+        </div>
+        <div id="practice-feedback" class="feedback" style="display:none;"></div>
+    </div>
+
+    <!-- 3. 默書模式專區 -->
+    <div id="dictation-section" class="section">
+        <h2>默書模式</h2>
+        <div class="exercise-config-box">
+            <div class="config-grid">
+                <label>默書方向: 
+                    <select id="dictation-mode-type" onchange="toggleDictationModeConfig()">
+                        <option value="cn-to-en">只顯示中文 (默寫英文)</option>
+                        <option value="en-to-cn">只顯示英文 (默寫中文)</option>
+                        <option value="hybrid">混合模式 (中譯英 + 英譯中)</option>
+                    </select>
+                </label>
+                <label>範圍選擇: 
+                    <select id="dictation-range" onchange="toggleDictationRangeConfig()">
+                        <option value="all">全部詞庫</option>
+                        <option value="category">按主分類篩選</option>
+                        <option value="subcategory">按子分類篩選</option>
+                        <option value="custom">自選（已勾選項目） (<span id="dict-custom-count">0</span>)</option>
+                    </select>
+                </label>
+                <label>默書總題數:
+                    <input type="number" id="dictation-count" value="10" min="1" max="50" oninput="updateHybridAutoBalance()">
+                </label>
+            </div>
+
+            <div id="dictation-hybrid-config" style="display:none; margin-top: 15px; padding-top: 15px; border-top: 1px dashed var(--border-color);">
+                <span style="font-size:13px; font-weight:600; color:#334155;">混合方向分配方式：</span>
+                <div style="display:flex; gap:15px; flex-wrap:wrap; margin-top: 8px;">
+                    <label style="flex-direction:row; align-items:center; gap:6px; cursor:pointer; font-weight:normal;">
+                        <input type="radio" name="hybrid-mode-sub" value="random" checked onchange="toggleHybridSubConfig()"> 隨機混合分配
+                    </label>
+                    <label style="flex-direction:row; align-items:center; gap:6px; cursor:pointer; font-weight:normal;">
+                        <input type="radio" name="hybrid-mode-sub" value="manual" onchange="toggleHybridSubConfig()"> 自訂題數比例
+                    </label>
+                </div>
+                <div id="hybrid-manual-inputs" style="display:none; margin-top: 10px; display: flex; gap: 15px; flex-wrap: wrap;">
+                    <label>中譯英題數: <input type="number" id="hybrid-cn-num" value="5" min="0" max="50" style="width:80px;" oninput="updateHybridAutoBalance()"></label>
+                    <label>英譯中題數 (自動計算): <input type="number" id="hybrid-en-num" value="5" readonly style="width:80px; background:#f1f5f9;"></label>
+                </div>
+            </div>
+
+            <div id="dictation-detail-container" style="margin-top: 15px; padding-top: 15px; border-top: 1px dashed var(--border-color);">
+            </div>
+
+            <div style="margin-top: 20px; display: flex; gap: 15px; align-items: center;">
+                <button class="action-btn" onclick="initDictation()">開始默書</button>
+            </div>
+        </div>
+        
+        <div id="dictation-container">
+        </div>
+        <div id="dictation-actions" style="display:none; margin-top: 20px;">
+            <button class="action-btn" onclick="checkDictation()">提交批改默書</button>
+            <button class="secondary-btn" onclick="initDictation()">生成另一組默書</button>
+        </div>
+        <div id="dictation-result" class="feedback" style="display:none; margin-top:15px;"></div>
+    </div>
+
+    <!-- 4. 錯題簿專區 -->
+    <div id="wrong-book-section" class="section">
+        <h2>錯題簿</h2>
+        <div class="notice-banner">
+            <span>⚠️ <strong>貼心提醒：</strong>錯題簿記錄僅保存在當前瀏覽器工作階段中，重新整理或關閉頁面後記錄將會歸零。</span>
+            <div class="export-buttons">
+                <button class="secondary-btn" onclick="exportWrongWords('word')" style="padding: 6px 12px; font-size: 13px;">匯出為 Word (.doc)</button>
+                <button class="secondary-btn" onclick="exportWrongWords('excel')" style="padding: 6px 12px; font-size: 13px;">匯出為 Excel (.csv)</button>
+            </div>
+        </div>
+        
+        <div class="table-responsive">
+            <table id="wrong-table">
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>主分類</th>
+                        <th>子分類</th>
+                        <th>中文詞彙 / 短語</th>
+                        <th>英文翻譯</th>
+                        <th>錯誤來源</th>
+                        <th>操作</th>
+                    </tr>
+                </thead>
+                <tbody id="wrong-table-body">
+                    <tr><td colspan="7" style="text-align:center; color:#64748b;">目前沒有錯題記錄，太棒了！繼續保持！</td></tr>
+                </tbody>
+            </table>
+        </div>
+        <div style="margin-top: 20px;">
+            <button class="secondary-btn" onclick="clearWrongBook()">清空錯題簿</button>
+        </div>
+    </div>
+
+</div>
+
+<script>
+    let selectedIds = new Set();
+    let wrongBook = [];
+    let currentQuestions = [];
+    let currentDictationItems = [];
+    let hiddenColumns = { cat: false, sub: false };
+    let masterData = [];
+
+    function parseSynonyms(text) {
+        if (text === null || text === undefined) return [];
+        let str = String(text);
+        let parts = str.split(/[\/、,，]|(?:\s*,\s*)|(?:\sand\s)/).map(s => s.trim()).filter(s => s.length > 0);
+        if (parts.length === 0) parts = [str.trim()];
+        return parts;
+    }
+
+    const rawData = [
+        ["Section 1: High-frequency language", "1. Common verbs", 1, "應該", "should"],
+        ["Section 1: High-frequency language", "1. Common verbs", 2, "到", "to arrive, to get to"],
+        ["Section 1: High-frequency language", "1. Common verbs", 3, "問", "to ask"],
+        ["Section 1: High-frequency language", "1. Common verbs", 4, "是", "to be"],
+        ["Section 1: High-frequency language", "1. Common verbs", 5, "能", "to be able to, can"],
+        ["Section 1: High-frequency language", "1. Common verbs", 6, "對……有興趣", "to be interested in"],
+        ["Section 1: High-frequency language", "1. Common verbs", 7, "安靜", "to be quiet"],
+        ["Section 1: High-frequency language", "1. Common verbs", 8, "開始", "to begin"],
+        ["Section 1: High-frequency language", "1. Common verbs", 9, "買", "to buy"],
+        ["Section 1: High-frequency language", "1. Common verbs", 10, "叫", "to call,to be named"],
+        ["Section 1: High-frequency language", "1. Common verbs", 11, "換", "to change"],
+        ["Section 1: High-frequency language", "1. Common verbs", 12, "關", "to close, to switch off"],
+        ["Section 1: High-frequency language", "1. Common verbs", 13, "來", "to come"],
+        ["Section 1: High-frequency language", "1. Common verbs", 14, "說服", "to convince"],
+        ["Section 1: High-frequency language", "1. Common verbs", 15, "做", "to do, to be/become (occupation)"],
+        ["Section 1: High-frequency language", "1. Common verbs", 16, "畫", "to draw/paint (picture)"],
+        ["Section 1: High-frequency language", "1. Common verbs", 17, "喝", "to drink"],
+        ["Section 1: High-frequency language", "1. Common verbs", 18, "吃", "to eat"],
+        ["Section 1: High-frequency language", "1. Common verbs", 19, "進", "to enter"],
+        ["Section 1: High-frequency language", "1. Common verbs", 20, "找", "to find, to look for"],
+        ["Section 1: High-frequency language", "1. Common verbs", 21, "忘", "to forget"],
+        ["Section 1: High-frequency language", "1. Common verbs", 22, "生氣", "to get angry"],
+        ["Section 1: High-frequency language", "1. Common verbs", 23, "給", "to give"],
+        ["Section 1: High-frequency language", "1. Common verbs", 24, "送", "to give (present), to deliver, to say goodbye to someone"],
+        ["Section 1: High-frequency language", "1. Common verbs", 25, "去", "to go"],
+        ["Section 1: High-frequency language", "1. Common verbs", 26, "出", "to go out"],
+        ["Section 1: High-frequency language", "1. Common verbs", 27, "睡覺", "to go to bed, to sleep"],
+        ["Section 1: High-frequency language", "1. Common verbs", 28, "有", "to have"],
+        ["Section 1: High-frequency language", "1. Common verbs", 29, "幫助", "to help"],
+        ["Section 1: High-frequency language", "1. Common verbs", 30, "舉辦", "to hold, to conduct, to run"],
+        ["Section 1: High-frequency language", "1. Common verbs", 31, "希望", "to hope"],
+        ["Section 1: High-frequency language", "1. Common verbs", 32, "增加", "to increase, to add"],
+        ["Section 1: High-frequency language", "1. Common verbs", 33, "請", "to invite, to ask, please"],
+        ["Section 1: High-frequency language", "1. Common verbs", 34, "跳", "to jump"],
+        ["Section 1: High-frequency language", "1. Common verbs", 35, "解釋", "to justify"],
+        ["Section 1: High-frequency language", "1. Common verbs", 36, "知道", "to know"],
+        ["Section 1: High-frequency language", "1. Common verbs", 37, "認識", "to know (be familiar with)"],
+        ["Section 1: High-frequency language", "1. Common verbs", 38, "會", "to know how to, can"],
+        ["Section 1: High-frequency language", "1. Common verbs", 39, "笑", "to laugh, smile"],
+        ["Section 1: High-frequency language", "1. Common verbs", 40, "學習", "to learn, to study"],
+        ["Section 1: High-frequency language", "1. Common verbs", 41, "讓", "to let, to allow, to make"],
+        ["Section 1: High-frequency language", "1. Common verbs", 42, "喜歡", "to like"],
+        ["Section 1: High-frequency language", "1. Common verbs", 43, "聽", "to listen/hear"],
+        ["Section 1: High-frequency language", "1. Common verbs", 44, "住", "to live"],
+        ["Section 1: High-frequency language", "1. Common verbs", 45, "愛", "to love"],
+        ["Section 1: High-frequency language", "1. Common verbs", 46, "見/見面", "to meet"],
+        ["Section 1: High-frequency language", "1. Common verbs", 47, "玩", "to play"],
+        ["Section 1: High-frequency language", "1. Common verbs", 48, "打", "to play (ball game), to make (phone call), to beat"],
+        ["Section 1: High-frequency language", "1. Common verbs", 49, "踢", "to play (football), to kick"],
+        ["Section 1: High-frequency language", "1. Common verbs", 50, "準備", "to prepare"],
+        ["Section 1: High-frequency language", "1. Common verbs", 51, "放", "to put, to set free"],
+        ["Section 1: High-frequency language", "1. Common verbs", 52, "記", "to remember, to write down"],
+        ["Section 1: High-frequency language", "1. Common verbs", 53, "回", "to return"],
+        ["Section 1: High-frequency language", "1. Common verbs", 54, "騎", "to ride (a bicycle/horse)"],
+        ["Section 1: High-frequency language", "1. Common verbs", 55, "說", "to say, to speak, to talk"],
+        ["Section 1: High-frequency language", "1. Common verbs", 56, "看", "to see, to read, to watch, to look at"],
+        ["Section 1: High-frequency language", "1. Common verbs", 57, "好像", "to seem"],
+        ["Section 1: High-frequency language", "1. Common verbs", 58, "賣", "to sell"],
+        ["Section 1: High-frequency language", "1. Common verbs", 59, "寄（信）", "to send (a letter)"],
+        ["Section 1: High-frequency language", "1. Common verbs", 60, "發（電子郵件）", "to send (an email)"],
+        ["Section 1: High-frequency language", "1. Common verbs", 61, "唱", "to sing"],
+        ["Section 1: High-frequency language", "1. Common verbs", 62, "坐", "to sit"],
+        ["Section 1: High-frequency language", "1. Common verbs", 63, "花", "to spend (time/money); flower"],
+        ["Section 1: High-frequency language", "1. Common verbs", 64, "停", "to stop"],
+        ["Section 1: High-frequency language", "1. Common verbs", 65, "開", "to switch on, to turn on, to open"],
+        ["Section 1: High-frequency language", "1. Common verbs", 66, "參加", "to take part"],
+        ["Section 1: High-frequency language", "1. Common verbs", 67, "教", "to teach"],
+        ["Section 1: High-frequency language", "1. Common verbs", 68, "告訴", "to tell"],
+        ["Section 1: High-frequency language", "1. Common verbs", 69, "覺得", "to think, to feel"],
+        ["Section 1: High-frequency language", "1. Common verbs", 70, "試", "to try"],
+        ["Section 1: High-frequency language", "1. Common verbs", 71, "懂", "to understand"],
+        ["Section 1: High-frequency language", "1. Common verbs", 72, "用", "to use"],
+        ["Section 1: High-frequency language", "1. Common verbs", 73, "等", "to wait for"],
+        ["Section 1: High-frequency language", "1. Common verbs", 74, "想", "to want"],
+        ["Section 1: High-frequency language", "1. Common verbs", 75, "要", "to want, be going to"],
+        ["Section 1: High-frequency language", "1. Common verbs", 76, "洗", "to wash"],
+        ["Section 1: High-frequency language", "1. Common verbs", 77, "穿", "to wear, to put on"],
+        ["Section 1: High-frequency language", "1. Common verbs", 78, "祝", "to wish"],
+        ["Section 1: High-frequency language", "1. Common verbs", 79, "寫", "to write"],
+
+        ["Section 1: High-frequency language", "2. Common adjectives", 1, "先進", "advanced"],
+        ["Section 1: High-frequency language", "2. Common adjectives", 2, "壞", "bad"],
+        ["Section 1: High-frequency language", "2. Common adjectives", 3, "漂亮", "beautiful"],
+        ["Section 1: High-frequency language", "2. Common adjectives", 4, "大", "big"],
+        ["Section 1: High-frequency language", "2. Common adjectives", 5, "無聊/沒意思", "bored, boring"],
+        ["Section 1: High-frequency language", "2. Common adjectives", 6, "忙", "busy"],
+        ["Section 1: High-frequency language", "2. Common adjectives", 7, "乾淨", "clean"],
+        ["Section 1: High-frequency language", "2. Common adjectives", 8, "冷", "cold"],
+        ["Section 1: High-frequency language", "2. Common adjectives", 9, "舒服", "comfortable"],
+        ["Section 1: High-frequency language", "2. Common adjectives", 10, "對", "correct, right"],
+        ["Section 1: High-frequency language", "2. Common adjectives", 11, "髒", "dirty"],
+        ["Section 1: High-frequency language", "2. Common adjectives", 12, "容易", "easy"],
+        ["Section 1: High-frequency language", "2. Common adjectives", 13, "快", "fast, quick"],
+        ["Section 1: High-frequency language", "2. Common adjectives", 14, "胖，肥", "fat"],
+        ["Section 1: High-frequency language", "2. Common adjectives", 15, "飽", "full up, eaten to one's satisfaction"],
+        ["Section 1: High-frequency language", "2. Common adjectives", 16, "有趣", "fun, funny, interesting"],
+        ["Section 1: High-frequency language", "2. Common adjectives", 17, "好", "good"],
+        ["Section 1: High-frequency language", "2. Common adjectives", 18, "快樂", "happy"],
+        ["Section 1: High-frequency language", "2. Common adjectives", 19, "難", "hard, difficult"],
+        ["Section 1: High-frequency language", "2. Common adjectives", 20, "努力", "hardworking"],
+        ["Section 1: High-frequency language", "2. Common adjectives", 21, "有害", "harmful"],
+        ["Section 1: High-frequency language", "2. Common adjectives", 22, "健康", "healthy, health"],
+        ["Section 1: High-frequency language", "2. Common adjectives", 23, "高", "high, tall"],
+        ["Section 1: High-frequency language", "2. Common adjectives", 24, "熱", "hot"],
+        ["Section 1: High-frequency language", "2. Common adjectives", 25, "餓", "hungry"],
+        ["Section 1: High-frequency language", "2. Common adjectives", 26, "有意思", "interesting"],
+        ["Section 1: High-frequency language", "2. Common adjectives", 27, "好玩", "interesting, amusing, cute"],
+        ["Section 1: High-frequency language", "2. Common adjectives", 28, "長", "long"],
+        ["Section 1: High-frequency language", "2. Common adjectives", 29, "可愛", "lovely, loveable"],
+        ["Section 1: High-frequency language", "2. Common adjectives", 30, "最", "most"],
+        ["Section 1: High-frequency language", "2. Common adjectives", 31, "近", "near"],
+        ["Section 1: High-frequency language", "2. Common adjectives", 32, "新", "new"],
+        ["Section 1: High-frequency language", "2. Common adjectives", 33, "老/舊", "old"],
+        ["Section 1: High-frequency language", "2. Common adjectives", 34, "高興/開心", "pleased, happy"],
+        ["Section 1: High-frequency language", "2. Common adjectives", 35, "有錢", "rich"],
+        ["Section 1: High-frequency language", "2. Common adjectives", 36, "一樣", "same"],
+        ["Section 1: High-frequency language", "2. Common adjectives", 37, "短", "short"],
+        ["Section 1: High-frequency language", "2. Common adjectives", 38, "慢", "slow"],
+        ["Section 1: High-frequency language", "2. Common adjectives", 39, "小", "small"],
+        ["Section 1: High-frequency language", "2. Common adjectives", 40, "瘦", "thin"],
+        ["Section 1: High-frequency language", "2. Common adjectives", 41, "渴", "thirsty"],
+        ["Section 1: High-frequency language", "2. Common adjectives", 42, "累", "tired"],
+        ["Section 1: High-frequency language", "2. Common adjectives", 43, "有用", "useful"],
+        ["Section 1: High-frequency language", "2. Common adjectives", 44, "錯", "wrong"],
+
+        ["Section 1: High-frequency language", "3. Common adverbs", 1, "再", "again"],
+        ["Section 1: High-frequency language", "3. Common adverbs", 2, "差不多", "almost"],
+        ["Section 1: High-frequency language", "3. Common adverbs", 3, "已經", "already"],
+        ["Section 1: High-frequency language", "3. Common adverbs", 4, "大約/差不多", "around, about, approximately"],
+        ["Section 1: High-frequency language", "3. Common adverbs", 5, "正在", "to be in the process of"],
+        ["Section 1: High-frequency language", "3. Common adverbs", 6, "都", "both, all"],
+        ["Section 1: High-frequency language", "3. Common adverbs", 7, "特別", "especially"],
+        ["Section 1: High-frequency language", "3. Common adverbs", 8, "非常", "extremely"],
+        ["Section 1: High-frequency language", "3. Common adverbs", 9, "這裡/這兒", "here"],
+        ["Section 1: High-frequency language", "3. Common adverbs", 10, "馬上", "immediately"],
+        ["Section 1: High-frequency language", "3. Common adverbs", 11, "很久", "(for a) long time"],
+        ["Section 1: High-frequency language", "3. Common adverbs", 12, "更", "more"],
+        ["Section 1: High-frequency language", "3. Common adverbs", 13, "附近", "nearby"],
+        ["Section 1: High-frequency language", "3. Common adverbs", 14, "不", "not"],
+        ["Section 1: High-frequency language", "3. Common adverbs", 15, "沒", "not (have)"],
+        ["Section 1: High-frequency language", "3. Common adverbs", 16, "常常", "often"],
+        ["Section 1: High-frequency language", "3. Common adverbs", 17, "可能", "perhaps, possibly"],
+        ["Section 1: High-frequency language", "3. Common adverbs", 18, "有時候", "sometimes"],
+        ["Section 1: High-frequency language", "3. Common adverbs", 19, "那裡/那兒", "there"],
+        ["Section 1: High-frequency language", "3. Common adverbs", 20, "也", "too"],
+        ["Section 1: High-frequency language", "3. Common adverbs", 21, "太……了", "too (adjectives)"],
+        ["Section 1: High-frequency language", "3. Common adverbs", 22, "很", "very"],
+
+        ["Section 1: High-frequency language", "4. Colours", 1, "黑", "black"],
+        ["Section 1: High-frequency language", "4. Colours", 2, "藍", "blue"],
+        ["Section 1: High-frequency language", "4. Colours", 3, "顔色", "colour"],
+        ["Section 1: High-frequency language", "4. Colours", 4, "綠", "green"],
+        ["Section 1: High-frequency language", "4. Colours", 5, "橙", "orange"],
+        ["Section 1: High-frequency language", "4. Colours", 6, "紅", "red"],
+        ["Section 1: High-frequency language", "4. Colours", 7, "白", "white"],
+        ["Section 1: High-frequency language", "4. Colours", 8, "黃", "yellow"],
+
+        ["Section 1: High-frequency language", "5. Numbers", 1, "一，二，三，四，五，六，七，八，九，十", "1 – 10"],
+        ["Section 1: High-frequency language", "5. Numbers", 2, "十一， 二十， 二十一，三十，……九十九", "11 – 99"],
+        ["Section 1: High-frequency language", "5. Numbers", 3, "百", "hundred"],
+        ["Section 1: High-frequency language", "5. Numbers", 4, "千", "thousand"],
+        ["Section 1: High-frequency language", "5. Numbers", 5, "萬", "10 thousand"],
+        ["Section 1: High-frequency language", "5. Numbers", 6, "兩", "(for quantity) two + Measure Word + noun"],
+        ["Section 1: High-frequency language", "5. Numbers", 7, "零", "zero"],
+
+        ["Section 1: High-frequency language", "6. Quantities and measures", 1, "隻", "measure word for animals"],
+        ["Section 1: High-frequency language", "6. Quantities and measures", 2, "本", "measure word for books"],
+        ["Section 1: High-frequency language", "6. Quantities and measures", 3, "把", "measure word for knives"],
+        ["Section 1: High-frequency language", "6. Quantities and measures", 4, "條", "measure word for long pieces (hair, branch, trousers etc.)"],
+        ["Section 1: High-frequency language", "6. Quantities and measures", 5, "張", "measure word for table, picture, paper etc."],
+        ["Section 1: High-frequency language", "6. Quantities and measures", 6, "瓶", "a bottle of"],
+        ["Section 1: High-frequency language", "6. Quantities and measures", 7, "碗", "a bowl of"],
+        ["Section 1: High-frequency language", "6. Quantities and measures", 8, "杯", "a cup of"],
+        ["Section 1: High-frequency language", "6. Quantities and measures", 9, "包", "a packet of, package"],
+        ["Section 1: High-frequency language", "6. Quantities and measures", 10, "雙", "a pair of"],
+        ["Section 1: High-frequency language", "6. Quantities and measures", 11, "件", "a piece of (garment)"],
+        ["Section 1: High-frequency language", "6. Quantities and measures", 12, "少", "few"],
+        ["Section 1: High-frequency language", "6. Quantities and measures", 13, "多", "many, how (+adjectives)"],
+        ["Section 1: High-frequency language", "6. Quantities and measures", 14, "幾個", "several"],
+        ["Section 1: High-frequency language", "6. Quantities and measures", 15, "個", "the most common measure word"],
+
+        ["Section 1: High-frequency language", "7. Time expressions", 1, "下午", "afternoon"],
+        ["Section 1: High-frequency language", "7. Time expressions", 2, "號/日", "date"],
+        ["Section 1: High-frequency language", "7. Time expressions", 3, "早", "early"],
+        ["Section 1: High-frequency language", "7. Time expressions", 4, "晚上", "evening"],
+        ["Section 1: High-frequency language", "7. Time expressions", 5, "每天，天天", "everyday"],
+        ["Section 1: High-frequency language", "7. Time expressions", 6, "從", "from"],
+        ["Section 1: High-frequency language", "7. Time expressions", 7, "半", "half"],
+        ["Section 1: High-frequency language", "7. Time expressions", 8, "小時/鐘頭", "hour"],
+        ["Section 1: High-frequency language", "7. Time expressions", 9, "將來", "in the future, future"],
+        ["Section 1: High-frequency language", "7. Time expressions", 10, "過去", "in the past, past"],
+        ["Section 1: High-frequency language", "7. Time expressions", 11, "上星期", "last week"],
+        ["Section 1: High-frequency language", "7. Time expressions", 12, "去年", "last year"],
+        ["Section 1: High-frequency language", "7. Time expressions", 13, "晚", "late"],
+        ["Section 1: High-frequency language", "7. Time expressions", 14, "中午", "midday"],
+        ["Section 1: High-frequency language", "7. Time expressions", 15, "分, 分鐘", "minute"],
+        ["Section 1: High-frequency language", "7. Time expressions", 16, "月", "month"],
+        ["Section 1: High-frequency language", "7. Time expressions", 17, "早上/上午", "morning"],
+        ["Section 1: High-frequency language", "7. Time expressions", 18, "下星期", "next week"],
+        ["Section 1: High-frequency language", "7. Time expressions", 19, "明年", "next year"],
+        ["Section 1: High-frequency language", "7. Time expressions", 20, "現在", "now"],
+        ["Section 1: High-frequency language", "7. Time expressions", 21, "點", "o'clock"],
+        ["Section 1: High-frequency language", "7. Time expressions", 22, "今年", "this year"],
+        ["Section 1: High-frequency language", "7. Time expressions", 23, "今天", "today"],
+        ["Section 1: High-frequency language", "7. Time expressions", 24, "明天", "tomorrow"],
+        ["Section 1: High-frequency language", "7. Time expressions", 25, "星期", "week"],
+        ["Section 1: High-frequency language", "7. Time expressions", 26, "週末", "weekend"],
+        ["Section 1: High-frequency language", "7. Time expressions", 27, "昨天", "yesterday"],
+
+        ["Section 1: High-frequency language", "8. Days of the week", 1, "星期一", "Monday"],
+        ["Section 1: High-frequency language", "8. Days of the week", 2, "星期二", "Tuesday"],
+        ["Section 1: High-frequency language", "8. Days of the week", 3, "星期三", "Wednesday"],
+        ["Section 1: High-frequency language", "8. Days of the week", 4, "星期四", "Thursday"],
+        ["Section 1: High-frequency language", "8. Days of the week", 5, "星期五", "Friday"],
+        ["Section 1: High-frequency language", "8. Days of the week", 6, "星期六", "Saturday"],
+        ["Section 1: High-frequency language", "8. Days of the week", 7, "星期日，星期天", "Sunday"],
+
+        ["Section 1: High-frequency language", "9. Months and seasons of the year", 1, "一月", "January"],
+        ["Section 1: High-frequency language", "9. Months and seasons of the year", 2, "二月", "February"],
+        ["Section 1: High-frequency language", "9. Months and seasons of the year", 3, "三月", "March"],
+        ["Section 1: High-frequency language", "9. Months and seasons of the year", 4, "四月", "April"],
+        ["Section 1: High-frequency language", "9. Months and seasons of the year", 5, "五月", "May"],
+        ["Section 1: High-frequency language", "9. Months and seasons of the year", 6, "六月", "June"],
+        ["Section 1: High-frequency language", "9. Months and seasons of the year", 7, "七月", "July"],
+        ["Section 1: High-frequency language", "9. Months and seasons of the year", 8, "八月", "August"],
+        ["Section 1: High-frequency language", "9. Months and seasons of the year", 9, "九月", "September"],
+        ["Section 1: High-frequency language", "9. Months and seasons of the year", 10, "十月", "October"],
+        ["Section 1: High-frequency language", "9. Months and seasons of the year", 11, "十一月", "November"],
+        ["Section 1: High-frequency language", "9. Months and seasons of the year", 12, "十二月", "December"],
+        ["Section 1: High-frequency language", "9. Months and seasons of the year", 13, "秋", "autumn"],
+        ["Section 1: High-frequency language", "9. Months and seasons of the year", 14, "季節", "season"],
+        ["Section 1: High-frequency language", "9. Months and seasons of the year", 15, "春", "spring"],
+        ["Section 1: High-frequency language", "9. Months and seasons of the year", 16, "夏", "summer"],
+        ["Section 1: High-frequency language", "9. Months and seasons of the year", 17, "冬", "winter"],
+
+        ["Section 1: High-frequency language", "10. Question words", 1, "嗎", "(question marker) used after a question sentence e.g. 'Have you had your dinner?'"],
+        ["Section 1: High-frequency language", "10. Question words", 2, "呢", "(question marker) often used at the end of a sentence where there is a statement followed by a question e.g. 'I am very busy, what about you?'"],
+        ["Section 1: High-frequency language", "10. Question words", 3, "吧", "used as an expression at the end of a statement e.g. 'that's fine'"],
+        ["Section 1: High-frequency language", "10. Question words", 4, "多少", "how many"],
+        ["Section 1: High-frequency language", "10. Question words", 5, "什麼", "what"],
+        ["Section 1: High-frequency language", "10. Question words", 6, "哪裡/哪兒", "where"],
+        ["Section 1: High-frequency language", "10. Question words", 7, "哪（個、本）", "which"],
+        ["Section 1: High-frequency language", "10. Question words", 8, "誰", "who"],
+        ["Section 1: High-frequency language", "10. Question words", 9, "為什麼", "why"],
+
+        ["Section 1: High-frequency language", "11. Other high-frequency words", 1, "他", "he, him"],
+        ["Section 1: High-frequency language", "11. Other high-frequency words", 2, "我", "I, me"],
+        ["Section 1: High-frequency language", "11. Other high-frequency words", 3, "小姐", "Miss"],
+        ["Section 1: High-frequency language", "11. Other high-frequency words", 4, "先生", "Mr, sir"],
+        ["Section 1: High-frequency language", "11. Other high-frequency words", 5, "太太", "Mrs"],
+        ["Section 1: High-frequency language", "11. Other high-frequency words", 6, "號碼", "number"],
+        ["Section 1: High-frequency language", "11. Other high-frequency words", 7, "她", "she, her"],
+        ["Section 1: High-frequency language", "11. Other high-frequency words", 8, "些/一些", "some"],
+        ["Section 1: High-frequency language", "11. Other high-frequency words", 9, "那", "that"],
+        ["Section 1: High-frequency language", "11. Other high-frequency words", 10, "東西", "thing"],
+        ["Section 1: High-frequency language", "11. Other high-frequency words", 11, "這", "this"],
+        ["Section 1: High-frequency language", "11. Other high-frequency words", 12, "時間", "time"],
+        ["Section 1: High-frequency language", "11. Other high-frequency words", 13, "辦法", "way, method, solution"],
+        ["Section 1: High-frequency language", "11. Other high-frequency words", 14, "我們, 你們, 他們, 她們", "we, us, you, they, them"],
+        ["Section 1: High-frequency language", "11. Other high-frequency words", 15, "你", "you"],
+
+        ["Section 1: High-frequency language", "12. Countries, continents, nationalities and languages", 1, "非洲", "Africa"],
+        ["Section 1: High-frequency language", "12. Countries, continents, nationalities and languages", 2, "美洲", "America"],
+        ["Section 1: High-frequency language", "12. Countries, continents, nationalities and languages", 3, "美國人", "American"],
+        ["Section 1: High-frequency language", "12. Countries, continents, nationalities and languages", 4, "亞洲", "Asia"],
+        ["Section 1: High-frequency language", "12. Countries, continents, nationalities and languages", 5, "英國人", "British"],
+        ["Section 1: High-frequency language", "12. Countries, continents, nationalities and languages", 6, "中國", "China"],
+        ["Section 1: High-frequency language", "12. Countries, continents, nationalities and languages", 7, "中國人", "Chinese"],
+        ["Section 1: High-frequency language", "12. Countries, continents, nationalities and languages", 8, "中文", "Chinese language"],
+        ["Section 1: High-frequency language", "12. Countries, continents, nationalities and languages", 9, "國家", "country"],
+        ["Section 1: High-frequency language", "12. Countries, continents, nationalities and languages", 10, "英語/英文", "English language"],
+        ["Section 1: High-frequency language", "12. Countries, continents, nationalities and languages", 11, "歐洲", "Europe"],
+        ["Section 1: High-frequency language", "12. Countries, continents, nationalities and languages", 12, "外語", "foreign language"],
+        ["Section 1: High-frequency language", "12. Countries, continents, nationalities and languages", 13, "法國", "France"],
+        ["Section 1: High-frequency language", "12. Countries, continents, nationalities and languages", 14, "法國人", "French"],
+        ["Section 1: High-frequency language", "12. Countries, continents, nationalities and languages", 15, "法文", "French language"],
+        ["Section 1: High-frequency language", "12. Countries, continents, nationalities and languages", 16, "語言", "language"],
+        ["Section 1: High-frequency language", "12. Countries, continents, nationalities and languages", 17, "國籍", "nationality"],
+        ["Section 1: High-frequency language", "12. Countries, continents, nationalities and languages", 18, "人", "people, person"],
+        ["Section 1: High-frequency language", "12. Countries, continents, nationalities and languages", 19, "漢語/普通話", "Standard Chinese language"],
+        ["Section 1: High-frequency language", "12. Countries, continents, nationalities and languages", 20, "英國", "United Kingdom"],
+        ["Section 1: High-frequency language", "12. Countries, continents, nationalities and languages", 21, "美國", "United States"],
+        ["Section 1: High-frequency language", "12. Countries, continents, nationalities and languages", 22, "加拿大", "Canada"],
+        ["Section 1: High-frequency language", "12. Countries, continents, nationalities and languages", 23, "德國", "Germany"],
+        ["Section 1: High-frequency language", "12. Countries, continents, nationalities and languages", 24, "意大利", "Italy"],
+        ["Section 1: High-frequency language", "12. Countries, continents, nationalities and languages", 25, "馬來西亞", "Malaysia"],
+        ["Section 1: High-frequency language", "12. Countries, continents, nationalities and languages", 26, "新加坡", "Singapore"],
+        ["Section 1: High-frequency language", "12. Countries, continents, nationalities and languages", 27, "西班牙", "Spain"],
+
+        ["Section 1: High-frequency language", "13. Social conventions", 1, "請問", "excuse me"],
+        ["Section 1: High-frequency language", "13. Social conventions", 2, "再見", "goodbye"],
+        ["Section 1: High-frequency language", "13. Social conventions", 3, "晚上好", "good evening"],
+        ["Section 1: High-frequency language", "13. Social conventions", 4, "晚安", "good night"],
+        ["Section 1: High-frequency language", "13. Social conventions", 5, "你好", "hello"],
+        ["Section 1: High-frequency language", "13. Social conventions", 6, "大家好", "hello, everyone"],
+        ["Section 1: High-frequency language", "13. Social conventions", 7, "沒關係", "it doesn't matter"],
+        ["Section 1: High-frequency language", "13. Social conventions", 8, "明天見", "see you tomorrow"],
+        ["Section 1: High-frequency language", "13. Social conventions", 9, "對不起", "sorry"],
+        ["Section 1: High-frequency language", "13. Social conventions", 10, "謝謝", "thank you"],
+
+        ["Section 1: High-frequency language", "14. Other useful expressions", 1, "無聊", "bored, comment about something that looks or sounds stupid"],
+        ["Section 1: High-frequency language", "14. Other useful expressions", 2, "糟糕!", "it's bad; how terrible!"],
+        ["Section 1: High-frequency language", "14. Other useful expressions", 3, "不錯", "not bad; that's right"],
+
+        ["Section 1: High-frequency language", "15. Prepositions", 1, "......以後", "after......"],
+        ["Section 1: High-frequency language", "15. Prepositions", 2, "......以前", "before......"],
+        ["Section 1: High-frequency language", "15. Prepositions", 3, "後（邊）", "behind"],
+        ["Section 1: High-frequency language", "15. Prepositions", 4, "下", "down"],
+        ["Section 1: High-frequency language", "15. Prepositions", 5, "......的時候", "during......"],
+        ["Section 1: High-frequency language", "15. Prepositions", 6, "裡 （邊）", "in"],
+        ["Section 1: High-frequency language", "15. Prepositions", 7, "在", "in, at, on"],
+        ["Section 1: High-frequency language", "15. Prepositions", 8, "前 （邊）", "in front of"],
+        ["Section 1: High-frequency language", "15. Prepositions", 9, "中間", "middle"],
+        ["Section 1: High-frequency language", "15. Prepositions", 10, "外 （邊）", "outside"],
+        ["Section 1: High-frequency language", "15. Prepositions", 11, "上", "up"],
+
+        ["Section 1: High-frequency language", "16. Language used in dialogues and messages", 1, "請等等", "I will put you through"],
+        ["Section 1: High-frequency language", "16. Language used in dialogues and messages", 2, "馬上回來", "I'll be right back"],
+        ["Section 1: High-frequency language", "16. Language used in dialogues and messages", 3, "請說", "I'm listening"],
+        ["Section 1: High-frequency language", "16. Language used in dialogues and messages", 4, "等一下", "wait a moment"],
+        ["Section 1: High-frequency language", "16. Language used in dialogues and messages", 5, "打錯了", "wrong number"],
+
+        ["Section 2: Topic-specific language", "1. Identity and culture: daily life, food and drink, including eating out", 1, "優點/好處", "advantage"],
+        ["Section 2: Topic-specific language", "1. Identity and culture: daily life, food and drink, including eating out", 2, "牛肉", "beef"],
+        ["Section 2: Topic-specific language", "1. Identity and culture: daily life, food and drink, including eating out", 3, "麵包", "bread"],
+        ["Section 2: Topic-specific language", "1. Identity and culture: daily life, food and drink, including eating out", 4, "早飯/早餐", "breakfast"],
+        ["Section 2: Topic-specific language", "1. Identity and culture: daily life, food and drink, including eating out", 5, "蛋糕", "cake"],
+        ["Section 2: Topic-specific language", "1. Identity and culture: daily life, food and drink, including eating out", 6, "慶祝", "celebration(s)/to celebrate"],
+        ["Section 2: Topic-specific language", "1. Identity and culture: daily life, food and drink, including eating out", 7, "便宜", "cheap"],
+        ["Section 2: Topic-specific language", "1. Identity and culture: daily life, food and drink, including eating out", 8, "雞", "chicken"],
+        ["Section 2: Topic-specific language", "1. Identity and culture: daily life, food and drink, including eating out", 9, "筷子", "chopsticks"],
+        ["Section 2: Topic-specific language", "1. Identity and culture: daily life, food and drink, including eating out", 10, "咖啡", "coffee"],
+        ["Section 2: Topic-specific language", "1. Identity and culture: daily life, food and drink, including eating out", 11, "方便", "convenient"],
+        ["Section 2: Topic-specific language", "1. Identity and culture: daily life, food and drink, including eating out", 12, "信用卡", "credit card"],
+        ["Section 2: Topic-specific language", "1. Identity and culture: daily life, food and drink, including eating out", 13, "文化", "culture"],
+        ["Section 2: Topic-specific language", "1. Identity and culture: daily life, food and drink, including eating out", 14, "傳統/習俗", "customs/traditions"],
+        ["Section 2: Topic-specific language", "1. Identity and culture: daily life, food and drink, including eating out", 15, "好吃/美味", "delicious"],
+        ["Section 2: Topic-specific language", "1. Identity and culture: daily life, food and drink, including eating out", 16, "鴨", "duck"],
+        ["Section 2: Topic-specific language", "1. Identity and culture: daily life, food and drink, including eating out", 17, "餃子", "dumpling"],
+        ["Section 2: Topic-specific language", "1. Identity and culture: daily life, food and drink, including eating out", 18, "蛋", "egg"],
+        ["Section 2: Topic-specific language", "1. Identity and culture: daily life, food and drink, including eating out", 19, "晚飯/晚餐", "evening meal, dinner, supper"],
+        ["Section 2: Topic-specific language", "1. Identity and culture: daily life, food and drink, including eating out", 20, "快餐店", "fast food restaurant"],
+        ["Section 2: Topic-specific language", "1. Identity and culture: daily life, food and drink, including eating out", 21, "電影", "film"],
+        ["Section 2: Topic-specific language", "1. Identity and culture: daily life, food and drink, including eating out", 22, "魚", "fish"],
+        ["Section 2: Topic-specific language", "1. Identity and culture: daily life, food and drink, including eating out", 23, "食物和飲料", "food and drink"],
+        ["Section 2: Topic-specific language", "1. Identity and culture: daily life, food and drink, including eating out", 24, "水果", "fruit"],
+        ["Section 2: Topic-specific language", "1. Identity and culture: daily life, food and drink, including eating out", 25, "果汁", "fruit juice"],
+        ["Section 2: Topic-specific language", "1. Identity and culture: daily life, food and drink, including eating out", 26, "身份", "identity"],
+        ["Section 2: Topic-specific language", "1. Identity and culture: daily life, food and drink, including eating out", 27, "興趣/愛好", "interests/hobbies"],
+        ["Section 2: Topic-specific language", "1. Identity and culture: daily life, food and drink, including eating out", 28, "午飯/午餐", "lunch"],
+        ["Section 2: Topic-specific language", "1. Identity and culture: daily life, food and drink, including eating out", 29, "肉", "meat"],
+        ["Section 2: Topic-specific language", "1. Identity and culture: daily life, food and drink, including eating out", 30, "菜單", "menu"],
+        ["Section 2: Topic-specific language", "1. Identity and culture: daily life, food and drink, including eating out", 31, "牛奶", "milk"],
+        ["Section 2: Topic-specific language", "1. Identity and culture: daily life, food and drink, including eating out", 32, "錢", "money"],
+        ["Section 2: Topic-specific language", "1. Identity and culture: daily life, food and drink, including eating out", 33, "月餅", "moon cake (related to Mid-Autumn festival)"],
+        ["Section 2: Topic-specific language", "1. Identity and culture: daily life, food and drink, including eating out", 34, "羊肉", "mutton"],
+        ["Section 2: Topic-specific language", "1. Identity and culture: daily life, food and drink, including eating out", 35, "麵(條)", "noodle"],
+        ["Section 2: Topic-specific language", "1. Identity and culture: daily life, food and drink, including eating out", 36, "豬肉", "pork"],
+        ["Section 2: Topic-specific language", "1. Identity and culture: daily life, food and drink, including eating out", 37, "餐廳/飯館", "restaurant"],
+        ["Section 2: Topic-specific language", "1. Identity and culture: daily life, food and drink, including eating out", 38, "米飯", "rice (cooked/boiled)"],
+        ["Section 2: Topic-specific language", "1. Identity and culture: daily life, food and drink, including eating out", 39, "粽子", "rice dumpling (related to Dragon Boat Festival)"],
+        ["Section 2: Topic-specific language", "1. Identity and culture: daily life, food and drink, including eating out", 40, "偶像", "role models"],
+        ["Section 2: Topic-specific language", "1. Identity and culture: daily life, food and drink, including eating out", 41, "烤", "roast"],
+        ["Section 2: Topic-specific language", "1. Identity and culture: daily life, food and drink, including eating out", 42, "買東西/購物", "shopping"],
+        ["Section 2: Topic-specific language", "1. Identity and culture: daily life, food and drink, including eating out", 43, "汽水", "soft drinks, fizzy drinks"],
+        ["Section 2: Topic-specific language", "1. Identity and culture: daily life, food and drink, including eating out", 44, "湯", "soup"],
+        ["Section 2: Topic-specific language", "1. Identity and culture: daily life, food and drink, including eating out", 45, "運動", "sport"],
+        ["Section 2: Topic-specific language", "1. Identity and culture: daily life, food and drink, including eating out", 46, "茶", "tea"],
+        ["Section 2: Topic-specific language", "1. Identity and culture: daily life, food and drink, including eating out", 47, "做飯", "to cook, prepare a meal"],
+        ["Section 2: Topic-specific language", "1. Identity and culture: daily life, food and drink, including eating out", 48, "點菜", "to order (from a menu)"],
+        ["Section 2: Topic-specific language", "1. Identity and culture: daily life, food and drink, including eating out", 49, "付錢", "to pay"],
+        ["Section 2: Topic-specific language", "1. Identity and culture: daily life, food and drink, including eating out", 50, "青菜", "vegetable"],
+        ["Section 2: Topic-specific language", "1. Identity and culture: daily life, food and drink, including eating out", 51, "錢包", "wallet, purse"],
+        ["Section 2: Topic-specific language", "1. Identity and culture: daily life, food and drink, including eating out", 52, "水", "water"],
+        ["Section 2: Topic-specific language", "1. Identity and culture: daily life, food and drink, including eating out", 53, "酒", "wine"],
+        ["Section 2: Topic-specific language", "1. Identity and culture: daily life, food and drink, including eating out", 54, "元/塊", "yuan"],
+
+        ["Section 2: Topic-specific language", "2. Words relating to dress and style", 1, "鞋/鞋子", "shoe"],
+        ["Section 2: Topic-specific language", "2. Words relating to dress and style", 2, "號/號碼 (大號, 中號, 小號)", "size (large, medium, small)"],
+        ["Section 2: Topic-specific language", "2. Words relating to dress and style", 3, "裙子", "skirt"],
+        ["Section 2: Topic-specific language", "2. Words relating to dress and style", 4, "毛衣", "sweater/jumper"],
+        ["Section 2: Topic-specific language", "2. Words relating to dress and style", 5, "試穿/試試", "to try on (for size)"],
+        ["Section 2: Topic-specific language", "2. Words relating to dress and style", 6, "運動鞋", "trainers"],
+        ["Section 2: Topic-specific language", "2. Words relating to dress and style", 7, "褲子", "trousers"],
+        ["Section 2: Topic-specific language", "2. Words relating to dress and style", 8, "手錶", "watch"],
+        ["Section 2: Topic-specific language", "2. Words relating to dress and style", 9, "時尚", "fashion"],
+        ["Section 2: Topic-specific language", "2. Words relating to dress and style", 10, "帽子", "hat"],
+        ["Section 2: Topic-specific language", "2. Words relating to dress and style", 11, "襯衣/襯衫", "shirt"],
+
+        ["Section 2: Topic-specific language", "3. Words on relations, relationships, personal and physical characteristics", 1, "年齡", "age"],
+        ["Section 2: Topic-specific language", "3. Words on relations, relationships, personal and physical characteristics", 2, "床", "bed"],
+        ["Section 2: Topic-specific language", "3. Words on relations, relationships, personal and physical characteristics", 3, "生日", "birthday"],
+        ["Section 2: Topic-specific language", "3. Words on relations, relationships, personal and physical characteristics", 4, "鳥", "bird"],
+        ["Section 2: Topic-specific language", "3. Words on relations, relationships, personal and physical characteristics", 5, "出生", "birth, to be born"],
+        ["Section 2: Topic-specific language", "3. Words on relations, relationships, personal and physical characteristics", 6, "男孩", "boy"],
+        ["Section 2: Topic-specific language", "3. Words on relations, relationships, personal and physical characteristics", 7, "貓", "cat"],
+        ["Section 2: Topic-specific language", "3. Words on relations, relationships, personal and physical characteristics", 8, "椅子", "chair"],
+        ["Section 2: Topic-specific language", "3. Words on relations, relationships, personal and physical characteristics", 9, "孩子/兒童", "child"],
+        ["Section 2: Topic-specific language", "3. Words on relations, relationships, personal and physical characteristics", 10, "鐘", "clock"],
+        ["Section 2: Topic-specific language", "3. Words on relations, relationships, personal and physical characteristics", 11, "衣服", "clothes"],
+        ["Section 2: Topic-specific language", "3. Words on relations, relationships, personal and physical characteristics", 12, "出生日期", "date of birth"],
+        ["Section 2: Topic-specific language", "3. Words on relations, relationships, personal and physical characteristics", 13, "狗", "dog"],
+        ["Section 2: Topic-specific language", "3. Words on relations, relationships, personal and physical characteristics", 14, "門", "door"],
+        ["Section 2: Topic-specific language", "3. Words on relations, relationships, personal and physical characteristics", 15, "哥哥", "elder brother"],
+        ["Section 2: Topic-specific language", "3. Words on relations, relationships, personal and physical characteristics", 16, "姐姐", "elder sister"],
+        ["Section 2: Topic-specific language", "3. Words on relations, relationships, personal and physical characteristics", 17, "老年人", "elderly people"],
+        ["Section 2: Topic-specific language", "3. Words on relations, relationships, personal and physical characteristics", 18, "眼睛", "eye"],
+        ["Section 2: Topic-specific language", "3. Words on relations, relationships, personal and physical characteristics", 19, "家", "family, home"],
+        ["Section 2: Topic-specific language", "3. Words on relations, relationships, personal and physical characteristics", 20, "家人", "family (member)"],
+        ["Section 2: Topic-specific language", "3. Words on relations, relationships, personal and physical characteristics", 21, "爸爸", "father"],
+        ["Section 2: Topic-specific language", "3. Words on relations, relationships, personal and physical characteristics", 22, "名字", "first name"],
+        ["Section 2: Topic-specific language", "3. Words on relations, relationships, personal and physical characteristics", 23, "朋友", "friend"],
+        ["Section 2: Topic-specific language", "3. Words on relations, relationships, personal and physical characteristics", 24, "冰箱", "fridge"],
+        ["Section 2: Topic-specific language", "3. Words on relations, relationships, personal and physical characteristics", 25, "姓名", "full name"],
+        ["Section 2: Topic-specific language", "3. Words on relations, relationships, personal and physical characteristics", 26, "女孩", "girl"],
+        ["Section 2: Topic-specific language", "3. Words on relations, relationships, personal and physical characteristics", 27, "眼鏡", "glasses"],
+        ["Section 2: Topic-specific language", "3. Words on relations, relationships, personal and physical characteristics", 28, "爺爺", "grandfather"],
+        ["Section 2: Topic-specific language", "3. Words on relations, relationships, personal and physical characteristics", 29, "奶奶", "grandmother"],
+        ["Section 2: Topic-specific language", "3. Words on relations, relationships, personal and physical characteristics", 30, "頭髮", "hair"],
+        ["Section 2: Topic-specific language", "3. Words on relations, relationships, personal and physical characteristics", 31, "房子/房屋", "house"],
+        ["Section 2: Topic-specific language", "3. Words on relations, relationships, personal and physical characteristics", 32, "家務", "house work"],
+        ["Section 2: Topic-specific language", "3. Words on relations, relationships, personal and physical characteristics", 33, "結婚", "marry"],
+        ["Section 2: Topic-specific language", "3. Words on relations, relationships, personal and physical characteristics", 34, "媽媽", "mother"],
+        ["Section 2: Topic-specific language", "3. Words on relations, relationships, personal and physical characteristics", 35, "寵物", "pet"],
+        ["Section 2: Topic-specific language", "3. Words on relations, relationships, personal and physical characteristics", 36, "關係", "relationship"],
+        ["Section 2: Topic-specific language", "3. Words on relations, relationships, personal and physical characteristics", 37, "自己", "self, oneself"],
+        ["Section 2: Topic-specific language", "3. Words on relations, relationships, personal and physical characteristics", 38, "沙發", "sofa"],
+        ["Section 2: Topic-specific language", "3. Words on relations, relationships, personal and physical characteristics", 39, "桌子", "table"],
+        ["Section 2: Topic-specific language", "3. Words on relations, relationships, personal and physical characteristics", 40, "電話", "telephone"],
+        ["Section 2: Topic-specific language", "3. Words on relations, relationships, personal and physical characteristics", 41, "電視機", "television"],
+        ["Section 2: Topic-specific language", "3. Words on relations, relationships, personal and physical characteristics", 42, "窗", "window"],
+        ["Section 2: Topic-specific language", "3. Words on relations, relationships, personal and physical characteristics", 43, "年", "year"],
+        ["Section 2: Topic-specific language", "3. Words on relations, relationships, personal and physical characteristics", 44, "……歲", "……years old"],
+        ["Section 2: Topic-specific language", "3. Words on relations, relationships, personal and physical characteristics", 45, "弟弟", "younger brother"],
+        ["Section 2: Topic-specific language", "3. Words on relations, relationships, personal and physical characteristics", 46, "妹妹", "younger sister"],
+        ["Section 2: Topic-specific language", "3. Words on relations, relationships, personal and physical characteristics", 47, "年輕人", "young people"],
+
+        ["Section 2: Topic-specific language", "4. Identity and culture: cultural life", 1, "中國新年/春節", "Chinese New Year/Spring Festival"],
+        ["Section 2: Topic-specific language", "4. Identity and culture: cultural life", 2, "聖誕節", "Christmas"],
+        ["Section 2: Topic-specific language", "4. Identity and culture: cultural life", 3, "比賽", "competition/matches"],
+        ["Section 2: Topic-specific language", "4. Identity and culture: cultural life", 4, "音樂會", "concert"],
+        ["Section 2: Topic-specific language", "4. Identity and culture: cultural life", 5, "騎自行車(單車)", "cycling"],
+        ["Section 2: Topic-specific language", "4. Identity and culture: cultural life", 6, "舞", "dance"],
+        ["Section 2: Topic-specific language", "4. Identity and culture: cultural life", 7, "舞龍", "Dragon Dance"],
+        ["Section 2: Topic-specific language", "4. Identity and culture: cultural life", 8, "做運動", "(to) do sports"],
+        ["Section 2: Topic-specific language", "4. Identity and culture: cultural life", 9, "電子遊戲", "electronic game"],
+        ["Section 2: Topic-specific language", "4. Identity and culture: cultural life", 10, "節日", "festival"],
+        ["Section 2: Topic-specific language", "4. Identity and culture: cultural life", 11, "有空", "free time"],
+        ["Section 2: Topic-specific language", "4. Identity and culture: cultural life", 12, "滑冰", "ice skating"],
+        ["Section 2: Topic-specific language", "4. Identity and culture: cultural life", 13, "舞獅", "Lion Dance"],
+        ["Section 2: Topic-specific language", "4. Identity and culture: cultural life", 14, "新年", "New Year"],
+        ["Section 2: Topic-specific language", "4. Identity and culture: cultural life", 15, "表演/演出", "performance"],
+        ["Section 2: Topic-specific language", "4. Identity and culture: cultural life", 16, "打球", "play a ball game (tennis, basketball… etc.)"],
+        ["Section 2: Topic-specific language", "4. Identity and culture: cultural life", 17, "(打)羽毛球", "(play) badminton"],
+        ["Section 2: Topic-specific language", "4. Identity and culture: cultural life", 18, "(打)籃球", "(play) basketball"],
+        ["Section 2: Topic-specific language", "4. Identity and culture: cultural life", 19, "(踢)足球", "(play) football"],
+        ["Section 2: Topic-specific language", "4. Identity and culture: cultural life", 20, "(打)乒乓球", "(play) table tennis"],
+        ["Section 2: Topic-specific language", "4. Identity and culture: cultural life", 21, "(打)網球", "(play) tennis"],
+        ["Section 2: Topic-specific language", "4. Identity and culture: cultural life", 22, "節目", "programme"],
+        ["Section 2: Topic-specific language", "4. Identity and culture: cultural life", 23, "看書/閱讀", "reading"],
+        ["Section 2: Topic-specific language", "4. Identity and culture: cultural life", 24, "跑步", "running, jogging"],
+        ["Section 2: Topic-specific language", "4. Identity and culture: cultural life", 25, "滑雪", "skiing"],
+        ["Section 2: Topic-specific language", "4. Identity and culture: cultural life", 26, "歌", "song"],
+        ["Section 2: Topic-specific language", "4. Identity and culture: cultural life", 27, "中秋節", "The Mid-Autumn Festival"],
+        ["Section 2: Topic-specific language", "4. Identity and culture: cultural life", 28, "跳舞", "to dance"],
+        ["Section 2: Topic-specific language", "4. Identity and culture: cultural life", 29, "聽音樂", "to listen to music"],
+        ["Section 2: Topic-specific language", "4. Identity and culture: cultural life", 30, "唱歌", "to sing, singing"],
+        ["Section 2: Topic-specific language", "4. Identity and culture: cultural life", 31, "游泳", "swimming"],
+        ["Section 2: Topic-specific language", "4. Identity and culture: cultural life", 32, "看電影", "watch movies"],
+        ["Section 2: Topic-specific language", "4. Identity and culture: cultural life", 33, "看新聞", "watch news"],
+        ["Section 2: Topic-specific language", "4. Identity and culture: cultural life", 34, "看電視", "watch television"],
+        ["Section 2: Topic-specific language", "4. Identity and culture: cultural life", 35, "運動員", "athlete, sportsman"],
+        ["Section 2: Topic-specific language", "4. Identity and culture: cultural life", 36, "冠軍", "champion"],
+        ["Section 2: Topic-specific language", "4. Identity and culture: cultural life", 37, "龍舟", "dragon boat"],
+        ["Section 2: Topic-specific language", "4. Identity and culture: cultural life", 38, "復活節", "Easter"],
+        ["Section 2: Topic-specific language", "4. Identity and culture: cultural life", 39, "鞭炮", "firecracker (related to the Chinese New Year)"],
+        ["Section 2: Topic-specific language", "4. Identity and culture: cultural life", 40, "散步", "(to) go for a walk/stroll"],
+        ["Section 2: Topic-specific language", "4. Identity and culture: cultural life", 41, "社交", "socialising"],
+        ["Section 2: Topic-specific language", "4. Identity and culture: cultural life", 42, "夏令營", "summer camp"],
+        ["Section 2: Topic-specific language", "4. Identity and culture: cultural life", 43, "隊", "team"],
+        ["Section 2: Topic-specific language", "4. Identity and culture: cultural life", 44, "隊員", "team member, player"],
+        ["Section 2: Topic-specific language", "4. Identity and culture: cultural life", 45, "端午節", "The Dragon Boat Festival"],
+
+        ["Section 2: Topic-specific language", "5. Identity and culture: using social media", 1, "博客", "blog"],
+        ["Section 2: Topic-specific language", "5. Identity and culture: using social media", 2, "電腦", "computer"],
+        ["Section 2: Topic-specific language", "5. Identity and culture: using social media", 3, "電子郵件", "e-mail"],
+        ["Section 2: Topic-specific language", "5. Identity and culture: using social media", 4, "網友", "e-pal"],
+        ["Section 2: Topic-specific language", "5. Identity and culture: using social media", 5, "社交媒體", "social media"],
+        ["Section 2: Topic-specific language", "5. Identity and culture: using social media", 6, "上網", "surf the internet"],
+        ["Section 2: Topic-specific language", "5. Identity and culture: using social media", 7, "科技", "technology"],
+        ["Section 2: Topic-specific language", "5. Identity and culture: using social media", 8, "聊天", "to chat (online, on MSN etc.)"],
+        ["Section 2: Topic-specific language", "5. Identity and culture: using social media", 9, "聊天室", "chat room"],
+        ["Section 2: Topic-specific language", "5. Identity and culture: using social media", 10, "台式電腦", "desktop computer"],
+        ["Section 2: Topic-specific language", "5. Identity and culture: using social media", 11, "筆記本電腦", "laptop computer"],
+        ["Section 2: Topic-specific language", "5. Identity and culture: using social media", 12, "短信", "text message"],
+        ["Section 2: Topic-specific language", "5. Identity and culture: using social media", 13, "發短信", "to text"],
+        ["Section 2: Topic-specific language", "5. Identity and culture: using social media", 14, "下載", "to download"],
+        ["Section 2: Topic-specific language", "5. Identity and culture: using social media", 15, "病毒", "virus"],
+        ["Section 2: Topic-specific language", "5. Identity and culture: using social media", 16, "網址", "URL/web address"],
+        ["Section 2: Topic-specific language", "5. Identity and culture: using social media", 17, "網頁", "web page"],
+        ["Section 2: Topic-specific language", "5. Identity and culture: using social media", 18, "網站", "website"],
+
+        ["Section 2: Topic-specific language", "6. Local area, holiday and travel", 1, "住的地方", "accommodation"],
+        ["Section 2: Topic-specific language", "6. Local area, holiday and travel", 2, "活動", "activity"],
+        ["Section 2: Topic-specific language", "6. Local area, holiday and travel", 3, "空調", "air-conditioning"],
+        ["Section 2: Topic-specific language", "6. Local area, holiday and travel", 4, "飛機場", "airport"],
+        ["Section 2: Topic-specific language", "6. Local area, holiday and travel", 5, "銀行", "bank"],
+        ["Section 2: Topic-specific language", "6. Local area, holiday and travel", 6, "北京", "Beijing"],
+        ["Section 2: Topic-specific language", "6. Local area, holiday and travel", 7, "自行車/單車", "bicycle"],
+        ["Section 2: Topic-specific language", "6. Local area, holiday and travel", 8, "船", "boat/ship/ferry"],
+        ["Section 2: Topic-specific language", "6. Local area, holiday and travel", 9, "橋", "bridge"],
+        ["Section 2: Topic-specific language", "6. Local area, holiday and travel", 10, "公共汽車", "bus"],
+        ["Section 2: Topic-specific language", "6. Local area, holiday and travel", 11, "坐 (車/火車……)", "by (car/train/bus/boat etc.)"],
+        ["Section 2: Topic-specific language", "6. Local area, holiday and travel", 12, "書法", "calligraphy"],
+        ["Section 2: Topic-specific language", "6. Local area, holiday and travel", 13, "汽車", "car"],
+        ["Section 2: Topic-specific language", "6. Local area, holiday and travel", 14, "停車場", "car park"],
+        ["Section 2: Topic-specific language", "6. Local area, holiday and travel", 15, "教堂", "cathedral/church"],
+        ["Section 2: Topic-specific language", "6. Local area, holiday and travel", 16, "電影院", "cinema"],
+        ["Section 2: Topic-specific language", "6. Local area, holiday and travel", 17, "城市", "city"],
+        ["Section 2: Topic-specific language", "6. Local area, holiday and travel", 18, "毛筆", "Chinese brush"],
+        ["Section 2: Topic-specific language", "6. Local area, holiday and travel", 19, "國畫", "Chinese painting"],
+        ["Section 2: Topic-specific language", "6. Local area, holiday and travel", 20, "農村", "countryside"],
+        ["Section 2: Topic-specific language", "6. Local area, holiday and travel", 21, "球場 (足球場, 網球場……)", "court (sports – e.g. football, tennis... etc.)"],
+        ["Section 2: Topic-specific language", "6. Local area, holiday and travel", 22, "目的地", "destination"],
+        ["Section 2: Topic-specific language", "6. Local area, holiday and travel", 23, "展覽會", "exhibition"],
+        ["Section 2: Topic-specific language", "6. Local area, holiday and travel", 24, "經驗/經歷", "experience"],
+        ["Section 2: Topic-specific language", "6. Local area, holiday and travel", 25, "工廠", "factory"],
+        ["Section 2: Topic-specific language", "6. Local area, holiday and travel", 26, "(一，二，……)層/樓", "floor (1st, 2nd…)"],
+        ["Section 2: Topic-specific language", "6. Local area, holiday and travel", 27, "花", "flower"],
+        ["Section 2: Topic-specific language", "6. Local area, holiday and travel", 28, "花園", "garden"],
+        ["Section 2: Topic-specific language", "6. Local area, holiday and travel", 29, "禮物", "gift, present"],
+        ["Section 2: Topic-specific language", "6. Local area, holiday and travel", 30, "草", "grass"],
+        ["Section 2: Topic-specific language", "6. Local area, holiday and travel", 31, "廣州", "Guangzhou"],
+        ["Section 2: Topic-specific language", "6. Local area, holiday and travel", 32, "客人", "guest"],
+        ["Section 2: Topic-specific language", "6. Local area, holiday and travel", 33, "山", "hill/mountain"],
+        ["Section 2: Topic-specific language", "6. Local area, holiday and travel", 34, "假期", "holiday"],
+        ["Section 2: Topic-specific language", "6. Local area, holiday and travel", 35, "香港", "Hong Kong"],
+        ["Section 2: Topic-specific language", "6. Local area, holiday and travel", 36, "醫院", "hospital"],
+        ["Section 2: Topic-specific language", "6. Local area, holiday and travel", 37, "酒店", "hotel"],
+        ["Section 2: Topic-specific language", "6. Local area, holiday and travel", 38, "風箏", "kite"],
+        ["Section 2: Topic-specific language", "6. Local area, holiday and travel", 39, "湖", "lake"],
+        ["Section 2: Topic-specific language", "6. Local area, holiday and travel", 40, "圖書館", "library"],
+        ["Section 2: Topic-specific language", "6. Local area, holiday and travel", 41, "當地", "local area"],
+        ["Section 2: Topic-specific language", "6. Local area, holiday and travel", 42, "倫敦", "London"],
+        ["Section 2: Topic-specific language", "6. Local area, holiday and travel", 43, "行李", "luggage"],
+        ["Section 2: Topic-specific language", "6. Local area, holiday and travel", 44, "地圖", "map"],
+        ["Section 2: Topic-specific language", "6. Local area, holiday and travel", 45, "博物館", "museum"],
+        ["Section 2: Topic-specific language", "6. Local area, holiday and travel", 46, "戶外活動", "outdoor activities"],
+        ["Section 2: Topic-specific language", "6. Local area, holiday and travel", 47, "熊猫", "panda"],
+        ["Section 2: Topic-specific language", "6. Local area, holiday and travel", 48, "公園", "park"],
+        ["Section 2: Topic-specific language", "6. Local area, holiday and travel", 49, "護照", "passport"],
+        ["Section 2: Topic-specific language", "6. Local area, holiday and travel", 50, "地方", "place"],
+        ["Section 2: Topic-specific language", "6. Local area, holiday and travel", 51, "飛機", "plane"],
+        ["Section 2: Topic-specific language", "6. Local area, holiday and travel", 52, "警察局", "police station"],
+        ["Section 2: Topic-specific language", "6. Local area, holiday and travel", 53, "郵局", "post office"],
+        ["Section 2: Topic-specific language", "6. Local area, holiday and travel", 54, "明信片", "postcard"],
+        ["Section 2: Topic-specific language", "6. Local area, holiday and travel", 55, "英鎊/鎊", "pound sterling"],
+        ["Section 2: Topic-specific language", "6. Local area, holiday and travel", 56, "更喜歡", "preference"],
+        ["Section 2: Topic-specific language", "6. Local area, holiday and travel", 57, "問題", "problem"],
+        ["Section 2: Topic-specific language", "6. Local area, holiday and travel", 58, "火車站", "railway station"],
+        ["Section 2: Topic-specific language", "6. Local area, holiday and travel", 59, "地區", "region"],
+        ["Section 2: Topic-specific language", "6. Local area, holiday and travel", 60, "回程/雙程（票）", "return journey (ticket)"],
+        ["Section 2: Topic-specific language", "6. Local area, holiday and travel", 61, "河", "river"],
+        ["Section 2: Topic-specific language", "6. Local area, holiday and travel", 62, "路", "road, line/route, bus number"],
+        ["Section 2: Topic-specific language", "6. Local area, holiday and travel", 63, "風景", "scenery"],
+        ["Section 2: Topic-specific language", "6. Local area, holiday and travel", 64, "海", "sea"],
+        ["Section 2: Topic-specific language", "6. Local area, holiday and travel", 65, "海邊", "seaside"],
+        ["Section 2: Topic-specific language", "6. Local area, holiday and travel", 66, "上海", "Shanghai"],
+        ["Section 2: Topic-specific language", "6. Local area, holiday and travel", 67, "商店", "shop"],
+        ["Section 2: Topic-specific language", "6. Local area, holiday and travel", 68, "購物中心", "shopping centre"],
+        ["Section 2: Topic-specific language", "6. Local area, holiday and travel", 69, "單程（票）", "single journey"],
+        ["Section 2: Topic-specific language", "6. Local area, holiday and travel", 70, "運動場", "sports ground"],
+        ["Section 2: Topic-specific language", "6. Local area, holiday and travel", 71, "廣場", "square"],
+        ["Section 2: Topic-specific language", "6. Local area, holiday and travel", 72, "體育館", "stadium"],
+        ["Section 2: Topic-specific language", "6. Local area, holiday and travel", 73, "郵票", "stamp"],
+        ["Section 2: Topic-specific language", "6. Local area, holiday and travel", 74, "車站", "station/stop (public transport)"],
+        ["Section 2: Topic-specific language", "6. Local area, holiday and travel", 75, "超級市場", "supermarket"],
+        ["Section 2: Topic-specific language", "6. Local area, holiday and travel", 76, "游泳池", "swimming pool"],
+        ["Section 2: Topic-specific language", "6. Local area, holiday and travel", 77, "臺灣", "Taiwan"],
+        ["Section 2: Topic-specific language", "6. Local area, holiday and travel", 78, "長城", "The Great Wall"],
+        ["Section 2: Topic-specific language", "6. Local area, holiday and travel", 79, "可做的事", "things to do"],
+        ["Section 2: Topic-specific language", "6. Local area, holiday and travel", 80, "天安門廣場", "Tiananmen Square"],
+        ["Section 2: Topic-specific language", "6. Local area, holiday and travel", 81, "票", "ticket"],
+        ["Section 2: Topic-specific language", "6. Local area, holiday and travel", 82, "訂（房，票）", "to book, to reserve"],
+        ["Section 2: Topic-specific language", "6. Local area, holiday and travel", 83, "開車", "to drive"],
+        ["Section 2: Topic-specific language", "6. Local area, holiday and travel", 84, "下車", "to get off, to alight"],
+        ["Section 2: Topic-specific language", "6. Local area, holiday and travel", 85, "上車", "to get on, to board (train, bus etc.)"],
+        ["Section 2: Topic-specific language", "6. Local area, holiday and travel", 86, "租", "to rent"],
+        ["Section 2: Topic-specific language", "6. Local area, holiday and travel", 87, "旅遊", "tourism"],
+        ["Section 2: Topic-specific language", "6. Local area, holiday and travel", 88, "遊客", "tourist"],
+        ["Section 2: Topic-specific language", "6. Local area, holiday and travel", 89, "參觀", "to visit (a place, a museum, etc.)"],
+        ["Section 2: Topic-specific language", "6. Local area, holiday and travel", 90, "歡迎", "to welcome"],
+        ["Section 2: Topic-specific language", "6. Local area, holiday and travel", 91, "市中心", "town centre"],
+        ["Section 2: Topic-specific language", "6. Local area, holiday and travel", 92, "火車", "train"],
+        ["Section 2: Topic-specific language", "6. Local area, holiday and travel", 93, "交通", "transport"],
+        ["Section 2: Topic-specific language", "6. Local area, holiday and travel", 94, "旅行", "travel"],
+        ["Section 2: Topic-specific language", "6. Local area, holiday and travel", 95, "樹", "tree"],
+        ["Section 2: Topic-specific language", "6. Local area, holiday and travel", 96, "地鐵站", "underground station"],
+        ["Section 2: Topic-specific language", "6. Local area, holiday and travel", 97, "地鐵", "underground train, tube, metro"],
+        ["Section 2: Topic-specific language", "6. Local area, holiday and travel", 98, "服務員", "waiter/waitress/attendant"],
+        ["Section 2: Topic-specific language", "6. Local area, holiday and travel", 99, "動物園", "zoo"],
+        ["Section 2: Topic-specific language", "6. Local area, holiday and travel", 100, "到達", "arrive"],
+        ["Section 2: Topic-specific language", "6. Local area, holiday and travel", 101, "找人幫忙/尋求幫助", "asking for help"],
+        ["Section 2: Topic-specific language", "6. Local area, holiday and travel", 102, "旅遊車", "coach"],
+        ["Section 2: Topic-specific language", "6. Local area, holiday and travel", 103, "解決問題", "dealing with problems"],
+        ["Section 2: Topic-specific language", "6. Local area, holiday and travel", 104, "出去吃飯", "eating out"],
+        ["Section 2: Topic-specific language", "6. Local area, holiday and travel", 105, "車費", "fare"],
+        ["Section 2: Topic-specific language", "6. Local area, holiday and travel", 106, "名勝", "scenic spots, places of interest"],
+        ["Section 2: Topic-specific language", "6. Local area, holiday and travel", 107, "服務台", "service desk"],
+        ["Section 2: Topic-specific language", "6. Local area, holiday and travel", 108, "出發", "set off, depart"],
+        ["Section 2: Topic-specific language", "6. Local area, holiday and travel", 109, "紀念品", "souvenir"],
+        ["Section 2: Topic-specific language", "6. Local area, holiday and travel", 110, "住", "stay (number of nights)"],
+        ["Section 2: Topic-specific language", "6. Local area, holiday and travel", 111, "停留", "stay, stop over"],
+        ["Section 2: Topic-specific language", "6. Local area, holiday and travel", 112, "臺北", "Taipei"],
+        ["Section 2: Topic-specific language", "6. Local area, holiday and travel", 113, "高樓", "tall building/block/apartments"],
+        ["Section 2: Topic-specific language", "6. Local area, holiday and travel", 114, "售票處", "ticket office"],
+        ["Section 2: Topic-specific language", "6. Local area, holiday and travel", 115, "時刻表", "timetable (transport)"],
+
+        ["Section 2: Topic-specific language", "7. Phrases associated with weather", 1, "秋天", "autumn"],
+        ["Section 2: Topic-specific language", "7. Phrases associated with weather", 2, "雲", "cloud"],
+        ["Section 2: Topic-specific language", "7. Phrases associated with weather", 3, "多雲", "cloudy"],
+        ["Section 2: Topic-specific language", "7. Phrases associated with weather", 4, "度", "degree (temperature)"],
+        ["Section 2: Topic-specific language", "7. Phrases associated with weather", 5, "霧", "fog"],
+        ["Section 2: Topic-specific language", "7. Phrases associated with weather", 6, "大霧", "foggy"],
+        ["Section 2: Topic-specific language", "7. Phrases associated with weather", 7, "月亮", "moon"],
+        ["Section 2: Topic-specific language", "7. Phrases associated with weather", 8, "雨", "rain"],
+        ["Section 2: Topic-specific language", "7. Phrases associated with weather", 9, "雪", "snow"],
+        ["Section 2: Topic-specific language", "7. Phrases associated with weather", 10, "春天", "spring"],
+        ["Section 2: Topic-specific language", "7. Phrases associated with weather", 11, "太陽", "sun"],
+        ["Section 2: Topic-specific language", "7. Phrases associated with weather", 12, "夏天", "summer"],
+        ["Section 2: Topic-specific language", "7. Phrases associated with weather", 13, "下雨", "to rain"],
+        ["Section 2: Topic-specific language", "7. Phrases associated with weather", 14, "下雪", "to snow"],
+        ["Section 2: Topic-specific language", "7. Phrases associated with weather", 15, "天氣", "weather"],
+        ["Section 2: Topic-specific language", "7. Phrases associated with weather", 16, "風", "wind"],
+        ["Section 2: Topic-specific language", "7. Phrases associated with weather", 17, "刮風/大風", "windy"],
+        ["Section 2: Topic-specific language", "7. Phrases associated with weather", 18, "冬天", "winter"],
+        ["Section 2: Topic-specific language", "7. Phrases associated with weather", 19, "最低氣溫", "lowest temperature"],
+        ["Section 2: Topic-specific language", "7. Phrases associated with weather", 20, "最高氣溫", "highest temperature"],
+        ["Section 2: Topic-specific language", "7. Phrases associated with weather", 21, "氣溫", "temperature"],
+        ["Section 2: Topic-specific language", "7. Phrases associated with weather", 22, "天氣預報", "weather forecast"],
+
+        ["Section 2: Topic-specific language", "8. Asking for directions", 1, "後邊", "behind"],
+        ["Section 2: Topic-specific language", "8. Asking for directions", 2, "方向", "direction"],
+        ["Section 2: Topic-specific language", "8. Asking for directions", 3, "遠", "far"],
+        ["Section 2: Topic-specific language", "8. Asking for directions", 4, "一直走", "go straight on"],
+        ["Section 2: Topic-specific language", "8. Asking for directions", 5, "在……前邊", "in front of"],
+        ["Section 2: Topic-specific language", "8. Asking for directions", 6, "近", "near (in distance)/close by"],
+        ["Section 2: Topic-specific language", "8. Asking for directions", 7, "在……旁邊", "next to"],
+        ["Section 2: Topic-specific language", "8. Asking for directions", 8, "走路", "on foot"],
+        ["Section 2: Topic-specific language", "8. Asking for directions", 9, "左邊", "on the left"],
+        ["Section 2: Topic-specific language", "8. Asking for directions", 10, "右邊", "on the right"],
+        ["Section 2: Topic-specific language", "8. Asking for directions", 11, "對面", "opposite"],
+        ["Section 2: Topic-specific language", "8. Asking for directions", 12, "下一個", "the next"],
+        ["Section 2: Topic-specific language", "8. Asking for directions", 13, "過", "to cross (road, bridge, river etc.)"],
+        ["Section 2: Topic-specific language", "8. Asking for directions", 14, "轉", "to turn (left, right)"],
+        ["Section 2: Topic-specific language", "8. Asking for directions", 15, "向", "towards"],
+        ["Section 2: Topic-specific language", "8. Asking for directions", 16, "東", "east"],
+        ["Section 2: Topic-specific language", "8. Asking for directions", 17, "北", "north"],
+        ["Section 2: Topic-specific language", "8. Asking for directions", 18, "南", "south"],
+        ["Section 2: Topic-specific language", "8. Asking for directions", 19, "西", "west"],
+
+        ["Section 2: Topic-specific language", "9. Dealing with problems", 1, "換", "to change (to another one)"],
+        ["Section 2: Topic-specific language", "9. Dealing with problems", 2, "壞了", "damaged/broken"],
+        ["Section 2: Topic-specific language", "9. Dealing with problems", 3, "不見了", "disappear/lost something"],
+        ["Section 2: Topic-specific language", "9. Dealing with problems", 4, "經理", "manager"],
+        ["Section 2: Topic-specific language", "9. Dealing with problems", 5, "不對/錯", "mistake"],
+        ["Section 2: Topic-specific language", "9. Dealing with problems", 6, "吵", "noisy"],
+        ["Section 2: Topic-specific language", "9. Dealing with problems", 7, "警察", "police/policeman"],
+        ["Section 2: Topic-specific language", "9. Dealing with problems", 8, "服務", "service"],
+        ["Section 2: Topic-specific language", "9. Dealing with problems", 9, "生病/不舒服", "ill/sick/unwell"],
+        ["Section 2: Topic-specific language", "9. Dealing with problems", 10, "噪音", "noise"],
+        ["Section 2: Topic-specific language", "9. Dealing with problems", 11, "滿意", "pleased/satisfactory"],
+        ["Section 2: Topic-specific language", "9. Dealing with problems", 12, "安全", "safe"],
+
+        ["Section 2: Topic-specific language", "10. School", 1, "書", "book"],
+        ["Section 2: Topic-specific language", "10. School", 2, "教室", "classroom"],
+        ["Section 2: Topic-specific language", "10. School", 3, "字典", "dictionary"],
+        ["Section 2: Topic-specific language", "10. School", 4, "考試", "examination"],
+        ["Section 2: Topic-specific language", "10. School", 5, "交換", "exchange"],
+        ["Section 2: Topic-specific language", "10. School", 6, "外語", "foreign languages"],
+        ["Section 2: Topic-specific language", "10. School", 7, "地理", "geography"],
+        ["Section 2: Topic-specific language", "10. School", 8, "上學", "go to school (as a student)"],
+        ["Section 2: Topic-specific language", "10. School", 9, "上課", "have a lesson"],
+        ["Section 2: Topic-specific language", "10. School", 10, "校長", "head teacher"],
+        ["Section 2: Topic-specific language", "10. School", 11, "歷史", "history"],
+        ["Section 2: Topic-specific language", "10. School", 12, "作業", "homework"],
+        ["Section 2: Topic-specific language", "10. School", 13, "數學", "maths"],
+        ["Section 2: Topic-specific language", "10. School", 14, "音樂", "music"],
+        ["Section 2: Topic-specific language", "10. School", 15, "體育", "P.E. (physical education)"],
+        ["Section 2: Topic-specific language", "10. School", 16, "筆", "pen"],
+        ["Section 2: Topic-specific language", "10. School", 17, "壓力", "pressure"],
+        ["Section 2: Topic-specific language", "10. School", 18, "小學", "primary school"],
+        ["Section 2: Topic-specific language", "10. School", 19, "成績", "results, marks, achievement"],
+        ["Section 2: Topic-specific language", "10. School", 20, "規定", "rule"],
+        ["Section 2: Topic-specific language", "10. School", 21, "學校", "school"],
+        ["Section 2: Topic-specific language", "10. School", 22, "學期", "school term"],
+        ["Section 2: Topic-specific language", "10. School", 23, "校服", "school uniform"],
+        ["Section 2: Topic-specific language", "10. School", 24, "同學", "schoolmate, classmate"],
+        ["Section 2: Topic-specific language", "10. School", 25, "科學", "science"],
+        ["Section 2: Topic-specific language", "10. School", 26, "中學", "secondary school"],
+        ["Section 2: Topic-specific language", "10. School", 27, "學生", "student"],
+        ["Section 2: Topic-specific language", "10. School", 28, "科目", "subject"],
+        ["Section 2: Topic-specific language", "10. School", 29, "暑假", "summer holiday"],
+        ["Section 2: Topic-specific language", "10. School", 30, "老師", "teacher"],
+        ["Section 2: Topic-specific language", "10. School", 31, "大學", "university"],
+        ["Section 2: Topic-specific language", "10. School", 32, "生物", "Biology"],
+        ["Section 2: Topic-specific language", "10. School", 33, "休息", "break"],
+        ["Section 2: Topic-specific language", "10. School", 34, "慶祝成功", "celebrating success"],
+        ["Section 2: Topic-specific language", "10. School", 35, "化學", "Chemistry"],
+        ["Section 2: Topic-specific language", "10. School", 36, "文章", "essay"],
+        ["Section 2: Topic-specific language", "10. School", 37, "高考", "GCE equivalent"],
+        ["Section 2: Topic-specific language", "10. School", 38, "中學會考", "GCSE equivalent"],
+        ["Section 2: Topic-specific language", "10. School", 39, "畢業", "graduate"],
+        ["Section 2: Topic-specific language", "10. School", 40, "分數", "mark, grade"],
+        ["Section 2: Topic-specific language", "10. School", 41, "物理", "physics"],
+        ["Section 2: Topic-specific language", "10. School", 42, "校際交換", "school exchange"],
+        ["Section 2: Topic-specific language", "10. School", 43, "學校活動", "school events/school activites"],
+        ["Section 2: Topic-specific language", "10. School", 44, "留學生", "student studying abroad"],
+        ["Section 2: Topic-specific language", "10. School", 45, "時間表", "timetable"],
+        ["Section 2: Topic-specific language", "10. School", 46, "集中/用心", "to pay attention"],
+        ["Section 2: Topic-specific language", "10. School", 47, "打算", "plan, intention"],
+        ["Section 2: Topic-specific language", "10. School", 48, "計劃", "plan, to plan"],
+
+        ["Section 2: Topic-specific language", "11. Future aspirations, study and work", 1, "演員", "actor/actress"],
+        ["Section 2: Topic-specific language", "11. Future aspirations, study and work", 2, "廣告", "advert"],
+        ["Section 2: Topic-specific language", "11. Future aspirations, study and work", 3, "理想", "ambition/ideal"],
+        ["Section 2: Topic-specific language", "11. Future aspirations, study and work", 4, "心願", "aspiration"],
+        ["Section 2: Topic-specific language", "11. Future aspirations, study and work", 5, "做生意", "business/trade"],
+        ["Section 2: Topic-specific language", "11. Future aspirations, study and work", 6, "職業", "career"],
+        ["Section 2: Topic-specific language", "11. Future aspirations, study and work", 7, "公司", "company/office"],
+        ["Section 2: Topic-specific language", "11. Future aspirations, study and work", 8, "醫生", "doctor"],
+        ["Section 2: Topic-specific language", "11. Future aspirations, study and work", 9, "司機", "driver"],
+        ["Section 2: Topic-specific language", "11. Future aspirations, study and work", 10, "工程師", "engineer"],
+        ["Section 2: Topic-specific language", "11. Future aspirations, study and work", 11, "僱傭", "employment"],
+        ["Section 2: Topic-specific language", "11. Future aspirations, study and work", 12, "有名", "famous"],
+        ["Section 2: Topic-specific language", "11. Future aspirations, study and work", 13, "訪問/採訪", "interview"],
+        ["Section 2: Topic-specific language", "11. Future aspirations, study and work", 14, "面試", "(job) interview"],
+        ["Section 2: Topic-specific language", "11. Future aspirations, study and work", 15, "介紹", "introduction, to introduce"],
+        ["Section 2: Topic-specific language", "11. Future aspirations, study and work", 16, "工作", "job, work"],
+        ["Section 2: Topic-specific language", "11. Future aspirations, study and work", 17, "記者", "journalist"],
+        ["Section 2: Topic-specific language", "11. Future aspirations, study and work", 18, "雜誌", "magazine"],
+        ["Section 2: Topic-specific language", "11. Future aspirations, study and work", 19, "新聞", "news"],
+        ["Section 2: Topic-specific language", "11. Future aspirations, study and work", 20, "報紙", "newspaper"],
+        ["Section 2: Topic-specific language", "11. Future aspirations, study and work", 21, "護士", "nurse"],
+        ["Section 2: Topic-specific language", "11. Future aspirations, study and work", 22, "兼職", "part time"],
+        ["Section 2: Topic-specific language", "11. Future aspirations, study and work", 23, "職業", "profession"],
+        ["Section 2: Topic-specific language", "11. Future aspirations, study and work", 24, "工資", "salary"],
+        ["Section 2: Topic-specific language", "11. Future aspirations, study and work", 25, "售貨員", "sales assistant"],
+        ["Section 2: Topic-specific language", "11. Future aspirations, study and work", 26, "歌星", "singer"],
+        ["Section 2: Topic-specific language", "11. Future aspirations, study and work", 27, "學習", "study"],
+        ["Section 2: Topic-specific language", "11. Future aspirations, study and work", 28, "申請", "to apply, application"],
+        ["Section 2: Topic-specific language", "11. Future aspirations, study and work", 29, "賺錢", "to earn money"],
+        ["Section 2: Topic-specific language", "11. Future aspirations, study and work", 30, "招請/聘請", "to recruit, to employ"],
+        ["Section 2: Topic-specific language", "11. Future aspirations, study and work", 31, "訓練/培訓", "training"],
+        ["Section 2: Topic-specific language", "11. Future aspirations, study and work", 32, "旅行社", "travel agency"],
+        ["Section 2: Topic-specific language", "11. Future aspirations, study and work", 33, "志願者/義工", "volunteer"],
+        ["Section 2: Topic-specific language", "11. Future aspirations, study and work", 34, "志願服務/義工服務", "volunteering"],
+        ["Section 2: Topic-specific language", "11. Future aspirations, study and work", 35, "工人", "worker"],
+        ["Section 2: Topic-specific language", "11. Future aspirations, study and work", 36, "課外", "beyond the classroom"],
+        ["Section 2: Topic-specific language", "11. Future aspirations, study and work", 37, "建立關係", "building relationships"],
+        ["Section 2: Topic-specific language", "11. Future aspirations, study and work", 38, "廚師", "cook/chef"],
+        ["Section 2: Topic-specific language", "11. Future aspirations, study and work", 39, "信心", "confidence"],
+        ["Section 2: Topic-specific language", "11. Future aspirations, study and work", 40, "有經驗", "experienced"],
+        ["Section 2: Topic-specific language", "11. Future aspirations, study and work", 41, "進一步學習", "further study"],
+        ["Section 2: Topic-specific language", "11. Future aspirations, study and work", 42, "組織/機構", "organisation"],
+        ["Section 2: Topic-specific language", "11. Future aspirations, study and work", 43, "組織者", "organiser"],
+        ["Section 2: Topic-specific language", "11. Future aspirations, study and work", 44, "零花錢/零用錢", "pocket money"],
+        ["Section 2: Topic-specific language", "11. Future aspirations, study and work", 45, "減少", "to reduce, to cut back"],
+        ["Section 2: Topic-specific language", "11. Future aspirations, study and work", 46, "成功", "success, successful"],
+        ["Section 2: Topic-specific language", "11. Future aspirations, study and work", 47, "工作經驗", "work experience"],
+
+        ["Section 2: Topic-specific language", "12. International and global dimension: bringing the world together, environmental issues", 1, "動物", "animals"],
+        ["Section 2: Topic-specific language", "12. International and global dimension: bringing the world together, environmental issues", 2, "觀眾", "audience"],
+        ["Section 2: Topic-specific language", "12. International and global dimension: bringing the world together, environmental issues", 3, "綠色環保的", "being 'green'"],
+        ["Section 2: Topic-specific language", "12. International and global dimension: bringing the world together, environmental issues", 4, "運動", "campaign"],
+        ["Section 2: Topic-specific language", "12. International and global dimension: bringing the world together, environmental issues", 5, "繼續", "carry on"],
+        ["Section 2: Topic-specific language", "12. International and global dimension: bringing the world together, environmental issues", 6, "慈善", "charity"],
+        ["Section 2: Topic-specific language", "12. International and global dimension: bringing the world together, environmental issues", 7, "捐", "donate"],
+        ["Section 2: Topic-specific language", "12. International and global dimension: bringing the world together, environmental issues", 8, "公益", "good causes"],
+        ["Section 2: Topic-specific language", "12. International and global dimension: bringing the world together, environmental issues", 9, "電", "electricity"],
+        ["Section 2: Topic-specific language", "12. International and global dimension: bringing the world together, environmental issues", 10, "環境", "environment"],
+        ["Section 2: Topic-specific language", "12. International and global dimension: bringing the world together, environmental issues", 11, "環境問題", "environmental issues"],
+        ["Section 2: Topic-specific language", "12. International and global dimension: bringing the world together, environmental issues", 12, "(音樂)節", "(music) festival"],
+        ["Section 2: Topic-specific language", "12. International and global dimension: bringing the world together, environmental issues", 13, "煤氣", "gas"],
+        ["Section 2: Topic-specific language", "12. International and global dimension: bringing the world together, environmental issues", 14, "全球", "global, world wide"],
+        ["Section 2: Topic-specific language", "12. International and global dimension: bringing the world together, environmental issues", 15, "重要", "important"],
+        ["Section 2: Topic-specific language", "12. International and global dimension: bringing the world together, environmental issues", 16, "國際", "international"],
+        ["Section 2: Topic-specific language", "12. International and global dimension: bringing the world together, environmental issues", 17, "國際活動", "international activity"],
+        ["Section 2: Topic-specific language", "12. International and global dimension: bringing the world together, environmental issues", 18, "音樂活動", "music event"],
+        ["Section 2: Topic-specific language", "12. International and global dimension: bringing the world together, environmental issues", 19, "自然資源", "natural resources"],
+        ["Section 2: Topic-specific language", "12. International and global dimension: bringing the world together, environmental issues", 20, "奧運會", "Olympic Games"],
+        ["Section 2: Topic-specific language", "12. International and global dimension: bringing the world together, environmental issues", 21, "保護", "protection, to protect"],
+        ["Section 2: Topic-specific language", "12. International and global dimension: bringing the world together, environmental issues", 22, "回收", "recycling"],
+        ["Section 2: Topic-specific language", "12. International and global dimension: bringing the world together, environmental issues", 23, "垃圾", "rubbish"],
+        ["Section 2: Topic-specific language", "12. International and global dimension: bringing the world together, environmental issues", 24, "節約（水）", "to save (water)"],
+        ["Section 2: Topic-specific language", "12. International and global dimension: bringing the world together, environmental issues", 25, "運動會", "sports event"],
+        ["Section 2: Topic-specific language", "12. International and global dimension: bringing the world together, environmental issues", 26, "浪費", "wasteful, to waste"],
+        ["Section 2: Topic-specific language", "12. International and global dimension: bringing the world together, environmental issues", 27, "世界", "world"],
+        ["Section 2: Topic-specific language", "12. International and global dimension: bringing the world together, environmental issues", 28, "世界盃/杯(足球)", "World Cup (football)"],
+        ["Section 2: Topic-specific language", "12. International and global dimension: bringing the world together, environmental issues", 29, "氣候", "climate"],
+        ["Section 2: Topic-specific language", "12. International and global dimension: bringing the world together, environmental issues", 30, "全球變暖", "global warming"],
+        ["Section 2: Topic-specific language", "12. International and global dimension: bringing the world together, environmental issues", 31, "污染", "pollution, to pollute, to contaminate"],
+        ["Section 2: Topic-specific language", "12. International and global dimension: bringing the world together, environmental issues", 32, "貧窮", "poverty"],
+        ["Section 2: Topic-specific language", "12. International and global dimension: bringing the world together, environmental issues", 33, "安全", "security"],
+        ["Section 2: Topic-specific language", "12. International and global dimension: bringing the world together, environmental issues", 34, "太陽能", "solar power"],
+        ["Section 2: Topic-specific language", "12. International and global dimension: bringing the world together, environmental issues", 35, "節約(能源)", "to save (energy)"],
+        ["Section 2: Topic-specific language", "12. International and global dimension: bringing the world together, environmental issues", 36, "分類(垃圾)", "to sort/separate (eg rubbish)"],
+        ["Section 2: Topic-specific language", "12. International and global dimension: bringing the world together, environmental issues", 37, "火山", "volcano"]
+    ];
+
+    rawData.forEach((item, index) => {
+        let shortCat = (item[0] && item[0].startsWith("Section 1")) ? "Section 1" : "Section 2";
+        let rawTerm = item[3] !== undefined ? item[3] : (item[2] !== undefined ? item[2] : "");
+        let rawTrans = item[4] !== undefined ? item[4] : (item[3] !== undefined ? item[3] : "");
+
+        masterData.push({
+            id: index + 1,
+            category: item[0] || "",
+            shortCategory: shortCat,
+            subcategory: item[1] || "",
+            seq: item[2] || 0,
+            term: rawTerm,
+            trans: rawTrans,
+            termsList: parseSynonyms(rawTerm),
+            transList: parseSynonyms(rawTrans)
+        });
+    });
+
+    document.addEventListener('DOMContentLoaded', () => {
+        updateSubcategoryOptions();
+        filterWordList();
+        toggleSourceConfig();
+        toggleDictationRangeConfig();
+        toggleDictationModeConfig();
+
+        const practiceTypeEl = document.getElementById('practice-type');
+        const practiceSourceEl = document.getElementById('practice-source');
+        const dictationRangeEl = document.getElementById('dictation-range');
+        const dictationModeTypeEl = document.getElementById('dictation-mode-type');
+
+        if(practiceTypeEl) practiceTypeEl.addEventListener('change', toggleSourceConfig);
+        if(practiceSourceEl) practiceSourceEl.addEventListener('change', toggleSourceConfig);
+        if(dictationRangeEl) dictationRangeEl.addEventListener('change', toggleDictationRangeConfig);
+        if(dictationModeTypeEl) dictationModeTypeEl.addEventListener('change', toggleDictationModeConfig);
+    });
+
+    function onCategoryFilterChange() {
+        updateSubcategoryOptions();
+        filterWordList();
+    }
+
+    function updateSubcategoryOptions() {
+        const catSelect = document.getElementById('category-filter');
+        const subSelect = document.getElementById('subcategory-filter');
+        if(!catSelect || !subSelect) return;
+
+        const cat = catSelect.value;
+        subSelect.innerHTML = '<option value="all">全部子分類</option>';
+
+        let subs = [];
+        if (cat === 'all') {
+            subs = [...new Set(masterData.map(d => d.subcategory))];
+        } else {
+            subs = [...new Set(masterData.filter(d => d.category === cat).map(d => d.subcategory))];
+        }
+
+        subs.forEach(s => {
+            if(!s) return;
+            const opt = document.createElement('option');
+            opt.value = s;
+            if (cat === 'all') {
+                let sampleItem = masterData.find(d => d.subcategory === s);
+                let secTag = sampleItem && sampleItem.shortCategory === "Section 1" ? "[Section 1]" : "[Section 2]";
+                opt.innerText = `${s} ${secTag}`;
+            } else {
+                opt.innerText = s;
+            }
+            subSelect.appendChild(opt);
+        });
+    }
+
+    function toggleColumn(colName) {
+        hiddenColumns[colName] = !hiddenColumns[colName];
+        filterWordList();
+    }
+
+    function switchTab(evt, sectionId) {
+        document.querySelectorAll('.section').forEach(sec => sec.classList.remove('active'));
+        document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+        const targetSec = document.getElementById(sectionId);
+        if(targetSec) targetSec.classList.add('active');
+        if(evt && evt.currentTarget) evt.currentTarget.classList.add('active');
+
+        if(sectionId === 'wrong-book-section') {
+            renderWrongBook();
+        }
+    }
+
+    function filterWordList() {
+        const catSelect = document.getElementById('category-filter');
+        const subSelect = document.getElementById('subcategory-filter');
+        const searchInput = document.getElementById('search-input');
+
+        const catVal = catSelect ? catSelect.value : 'all';
+        const subVal = subSelect ? subSelect.value : 'all';
+        const keyword = searchInput ? searchInput.value.toLowerCase() : '';
+
+        const catTh = document.querySelector('.th-cat');
+        const subTh = document.querySelector('.th-sub');
+
+        if (catTh) {
+            catTh.innerHTML = hiddenColumns.cat ? 
+                `主分類 <button class="toggle-btn" onclick="toggleColumn('cat')" title="展開主分類">👁️</button>` : 
+                `主分類 <button class="toggle-btn" onclick="toggleColumn('cat')" title="隱藏主分類">👁️</button>`;
+        }
+
+        if (subTh) {
+            subTh.innerHTML = hiddenColumns.sub ? 
+                `子分類 <button class="toggle-btn" onclick="toggleColumn('sub')" title="展開子分類">👁️</button>` : 
+                `子分類 <button class="toggle-btn" onclick="toggleColumn('sub')" title="隱藏子分類">👁️</button>`;
+        }
+
+        const filtered = masterData.filter(item => {
+            const matchesCat = (catVal === 'all') || (item.category === catVal);
+            const matchesSub = (subVal === 'all') || (item.subcategory === subVal);
+            const matchesKeyword = String(item.term).toLowerCase().includes(keyword) || String(item.trans).toLowerCase().includes(keyword);
+
+            return matchesCat && matchesSub && matchesKeyword;
+        });
+
+        renderTable(filtered, catVal === 'all');
+    }
+
+    function renderTable(data, isAllCategories) {
+        const tbody = document.getElementById('word-table-body');
+        if(!tbody) return;
+        tbody.innerHTML = '';
+        if(data.length === 0) {
+            let colSpan = 6 - (hiddenColumns.cat ? 1 : 0) - (hiddenColumns.sub ? 1 : 0);
+            tbody.innerHTML = `<tr><td colspan="${colSpan}" style="text-align:center; color:#64748b;">沒有找到符合的詞彙</td></tr>`;
+            return;
+        }
+        data.forEach(item => {
+            const uniqueKey = item.id;
+            const isChecked = selectedIds.has(uniqueKey) ? 'checked' : '';
+            const tr = document.createElement('tr');
+            
+            let isSec1 = item.shortCategory.includes("Section 1");
+            let mainBadgeClass = isSec1 ? "badge-sec1-main" : "badge-sec2-main";
+            let subBadgeClass = isSec1 ? "badge-sec1-sub" : "badge-sec2-sub";
+            
+            let subText = item.subcategory;
+            if (isAllCategories) {
+                let secTag = isSec1 ? " [Section 1]" : " [Section 2]";
+                subText += secTag;
+            }
+
+            let catTd = hiddenColumns.cat ? '' : `<td><span class="badge ${mainBadgeClass}">${item.shortCategory}</span></td>`;
+            let subTd = hiddenColumns.sub ? '' : `<td><span class="badge ${subBadgeClass}">${subText}</span></td>`;
+
+            tr.innerHTML = `
+                <td class="checkbox-cell"><input type="checkbox" value="${uniqueKey}" ${isChecked} onchange="toggleItemSelection(${uniqueKey}, this.checked)"></td>
+                <td>${item.id}</td>
+                <td><strong>${item.term}</strong></td>
+                <td>${item.trans}</td>
+                ${catTd}
+                ${subTd}
+            `;
+            tbody.appendChild(tr);
+        });
+    }
+
+    function toggleItemSelection(id, checked) {
+        if(checked) {
+            selectedIds.add(id);
+        } else {
+            selectedIds.delete(id);
+        }
+        updateSelectedCount();
+    }
+
+    function toggleSelectAll(selectAllCb) {
+        const checkboxes = document.querySelectorAll('#word-table-body input[type="checkbox"]');
+        checkboxes.forEach(cb => {
+            cb.checked = selectAllCb.checked;
+            const id = parseInt(cb.value);
+            if(selectAllCb.checked) selectedIds.add(id);
+            else selectedIds.delete(id);
+        });
+        updateSelectedCount();
+    }
+
+    function selectAllFiltered(select) {
+        const checkboxes = document.querySelectorAll('#word-table-body input[type="checkbox"]');
+        checkboxes.forEach(cb => {
+            cb.checked = select;
+            const id = parseInt(cb.value);
+            if(select) selectedIds.add(id);
+            else selectedIds.delete(id);
+        });
+        updateSelectedCount();
+    }
+
+    function updateSelectedCount() {
+        const scElem = document.getElementById('selected-count');
+        const dcElem = document.getElementById('dict-custom-count');
+        if(scElem) scElem.innerText = selectedIds.size;
+        if(dcElem) dcElem.innerText = selectedIds.size;
+    }
+
+    function toggleSourceConfig() {
+        const sourceEl = document.getElementById('practice-source');
+        const container = document.getElementById('source-detail-container');
+        const practiceTypeEl = document.getElementById('practice-type');
+        if(!sourceEl || !container || !practiceTypeEl) return;
+
+        const source = sourceEl.value;
+        const practiceType = practiceTypeEl.value;
+        
+        let html = '';
+        if(source === 'all') {
+            html = `<label>總題數設定: <input type="number" id="num-total" value="10" min="1" max="50" style="width:100px;"></label>`;
+        } else if(source === 'category') {
+            html = `
+                <div style="display:flex; gap:15px; flex-wrap:wrap;">
+                    <label>選擇主分類: 
+                        <select id="config-category">
+                            <option value="Section 1: High-frequency language">Section 1: High-frequency language</option>
+                            <option value="Section 2: Topic-specific language">Section 2: Topic-specific language</option>
+                        </select>
+                    </label>
+                    <label>題數: <input type="number" id="num-category" value="10" min="1" max="50" style="width:80px;"></label>
+                </div>`;
+        } else if(source === 'subcategory') {
+            let allSubs = [...new Set(masterData.map(d => d.subcategory))];
+            let subOptions = allSubs.map(s => `<option value="${s}">${s}</option>`).join('');
+            html = `
+                <div style="display:flex; gap:15px; flex-wrap:wrap;">
+                    <label>選擇子分類: 
+                        <select id="config-subcategory">${subOptions}</select>
+                    </label>
+                    <label>題數: <input type="number" id="num-subcategory" value="10" min="1" max="50" style="width:80px;"></label>
+                </div>`;
+        } else if(source === 'custom') {
+            html = `<p style="margin:0; font-size:14px; color:#1e293b;">將使用您在「字詞表」中勾選的字詞（目前已選 <strong>${selectedIds.size}</strong> 個）。若勾選不足請先至字詞表選取。</p>`;
+        }
+
+        if(practiceType === 'hybrid') {
+            html += `
+                <div style="margin-top:15px; padding-top:10px; border-top:1px dashed #cbd5e1; display:flex; gap:15px; flex-wrap:wrap;">
+                    <label>選擇題題數: <input type="number" id="hybrid-choice-num" value="5" min="1" max="30" style="width:80px;"></label>
+                    <label>拖曳配對題數: <input type="number" id="hybrid-drag-num" value="5" min="1" max="30" style="width:80px;"></label>
+                </div>`;
+        }
+
+        container.innerHTML = html;
+    }
+
+    function generatePractice() {
+        const typeEl = document.getElementById('practice-type');
+        const dirEl = document.getElementById('practice-direction');
+        const sourceEl = document.getElementById('practice-source');
+        const container = document.getElementById('practice-container');
+        if(!typeEl || !dirEl || !sourceEl || !container) return;
+
+        const type = typeEl.value;
+        const direction = dirEl.value;
+        const source = sourceEl.value;
+        
+        container.innerHTML = '';
+        const feedbackEl = document.getElementById('practice-feedback');
+        if(feedbackEl) feedbackEl.style.display = 'none';
+
+        let pool = [];
+        if(source === 'all') {
+            pool = [...masterData];
+        } else if(source === 'category') {
+            const catEl = document.getElementById('config-category');
+            const cat = catEl ? catEl.value : '';
+            pool = masterData.filter(d => d.category === cat);
+        } else if(source === 'subcategory') {
+            const subEl = document.getElementById('config-subcategory');
+            const sub = subEl ? subEl.value : '';
+            pool = masterData.filter(d => d.subcategory === sub);
+        } else if(source === 'custom') {
+            pool = masterData.filter(d => selectedIds.has(d.id));
+            if(pool.length === 0) {
+                alert('您尚未在字詞表中勾選任何字詞，請先返回字詞表勾選！');
+                return;
+            }
+        }
+
+        if(pool.length === 0) {
+            alert('找不到符合條件的詞彙，請調整篩選設定。');
+            return;
+        }
+
+        if(type === 'choice') {
+            let totalElem = document.getElementById('num-total');
+            let catElem = document.getElementById('num-category');
+            let subElem = document.getElementById('num-subcategory');
+            
+            let total = source === 'all' ? (totalElem ? parseInt(totalElem.value) || 10 : 10) : 
+                        (source === 'category' ? (catElem ? parseInt(catElem.value) || 10 : 10) : 
+                        (source === 'subcategory' ? (subElem ? parseInt(subElem.value) || 10 : 10) : pool.length));
+            pool.sort(() => 0.5 - Math.random());
+            currentQuestions = pool.slice(0, Math.min(total, pool.length));
+            renderChoiceQuestions(currentQuestions, direction);
+        } else if(type === 'drag') {
+            let totalElem = document.getElementById('num-total');
+            let catElem = document.getElementById('num-category');
+            let subElem = document.getElementById('num-subcategory');
+
+            let total = source === 'all' ? (totalElem ? parseInt(totalElem.value) || 5 : 5) : 
+                        (source === 'category' ? (catElem ? parseInt(catElem.value) || 5 : 5) : 
+                        (source === 'subcategory' ? (subElem ? parseInt(subElem.value) || 5 : 5) : pool.length));
+            pool.sort(() => 0.5 - Math.random());
+            currentQuestions = pool.slice(0, Math.min(total, pool.length));
+            renderDragQuestions(currentQuestions, direction);
+        } else if(type === 'hybrid') {
+            let choiceElem = document.getElementById('hybrid-choice-num');
+            let dragElem = document.getElementById('hybrid-drag-num');
+            let choiceNum = choiceElem ? parseInt(choiceElem.value) || 5 : 5;
+            let dragNum = dragElem ? parseInt(dragElem.value) || 5 : 5;
+            pool.sort(() => 0.5 - Math.random());
+            
+            let choicePool = pool.slice(0, Math.min(choiceNum, pool.length));
+            let remainingPool = pool.slice(choicePool.length);
+            let dragPool = remainingPool.slice(0, Math.min(dragNum, remainingPool.length));
+            
+            renderHybridQuestions(choicePool, dragPool, direction);
+        }
+
+        const actionsEl = document.getElementById('practice-actions');
+        if(actionsEl) actionsEl.style.display = 'block';
+    }
+
+    function renderChoiceQuestions(items, direction, startIndex = 1) {
+        const container = document.getElementById('practice-container');
+        if(!container) return;
+        let html = startIndex === 1 ? '<h3>選擇題練習</h3>' : '';
+        
+        items.forEach((item, index) => {
+            let qIdx = startIndex + index;
+            let dir = direction === 'random' ? (Math.random() > 0.5 ? 'cn-to-en' : 'en-to-cn') : direction;
+            let promptText = (dir === 'cn-to-en') ? `${item.term}` : `${item.trans}`;
+            
+            let correctAns = (dir === 'cn-to-en') ? (item.transList[0] || item.trans) : (item.termsList[0] || item.term);
+
+            let wrongs = masterData.filter(d => d.id !== item.id).sort(() => 0.5 - Math.random()).slice(0, 3);
+            let options = [...wrongs.map(w => (dir === 'cn-to-en' ? (w.transList[0] || w.trans) : (w.termsList[0] || w.term))), correctAns];
+            options.sort(() => 0.5 - Math.random());
+
+            let isSec1 = item.shortCategory.includes("Section 1");
+            let mainBadgeClass = isSec1 ? "badge-sec1-main" : "badge-sec2-main";
+            let subBadgeClass = isSec1 ? "badge-sec1-sub" : "badge-sec2-sub";
+
+            let validAnswersAttr = (dir === 'cn-to-en') ? JSON.stringify(item.transList) : JSON.stringify(item.termsList);
+
+            html += `<div class="question-card choice-card" data-valid-answers='${validAnswersAttr}' data-id="${item.id}">
+                <p>Q${qIdx}. ${promptText}</p>
+                <div style="margin-bottom: 10px; font-size: 13px; color: #64748b;">
+                    <span class="badge ${mainBadgeClass}">${item.shortCategory}</span>
+                    <span class="badge ${subBadgeClass}">${item.subcategory}</span>
+                </div>`;
+            options.forEach(opt => {
+                html += `<label style="margin-right:20px; cursor:pointer; display:inline-block; margin-bottom:8px;">
+                    <input type="radio" name="cq-${qIdx}" value="${opt}"> ${opt}
+                </label>`;
+            });
+            html += `</div>`;
+        });
+        container.insertAdjacentHTML('beforeend', html);
+    }
+
+    function renderDragQuestions(items, direction, startIndex = 1) {
+        const container = document.getElementById('practice-container');
+        if(!container) return;
+        let html = startIndex === 1 ? '<h3>拖曳配對練習</h3>' : '';
+        
+        items.forEach((item, index) => {
+            let qIdx = startIndex + index;
+            let dir = direction === 'random' ? (Math.random() > 0.5 ? 'cn-to-en' : 'en-to-cn') : direction;
+            
+            let others = masterData.filter(d => d.id !== item.id).sort(() => 0.5 - Math.random()).slice(0, 3);
+            let dragGroup = [...others, item].sort(() => 0.5 - Math.random());
+
+            let leftItems = [];
+            let rightItems = [];
+
+            dragGroup.forEach(d => {
+                let uniqueKey = d.id;
+                let lText = (dir === 'cn-to-en') ? `${d.term}` : `${d.trans}`;
+                let rText = (dir === 'cn-to-en') ? (d.transList[0] || d.trans) : (d.termsList[0] || d.term);
+                leftItems.push({ text: lText, key: uniqueKey });
+                rightItems.push({ text: rText, key: uniqueKey });
+            });
+
+            rightItems.sort(() => 0.5 - Math.random());
+            let isSec1 = item.shortCategory.includes("Section 1");
+            let mainBadgeClass = isSec1 ? "badge-sec1-main" : "badge-sec2-main";
+            let subBadgeClass = isSec1 ? "badge-sec1-sub" : "badge-sec2-sub";
+
+            html += `<div class="question-card drag-group-card" style="margin-bottom:25px;" data-id="${item.id}">
+                <p>Q${qIdx}. 拖曳配對組 (${dir === 'cn-to-en' ? '中配英' : '英配中'})</p>
+                <div style="margin-bottom: 10px; font-size: 13px; color: #64748b;">
+                    <span class="badge ${mainBadgeClass}">${item.shortCategory}</span>
+                    <span class="badge ${subBadgeClass}">${item.subcategory}</span>
+                </div>
+                <div class="drag-container">
+                    <div class="drag-list">
+                        <h4 style="margin-top:0; font-size:14px; color:#475569;">來源項目</h4>`;
+            leftItems.forEach(l => {
+                html += `<div class="draggable-item" draggable="true" ondragstart="drag(event)" data-match-key="${l.key}">${l.text}</div>`;
+            });
+            html += `</div><div class="drop-list">
+                        <h4 style="margin-top:0; font-size:14px; color:#475569;">目標配對區</h4>`;
+            rightItems.forEach(r => {
+                html += `<div class="drop-target" ondragover="allowDrop(event)" ondragleave="removeHover(event)" ondrop="drop(event, '${r.key}')" data-expected-key="${r.key}">
+                    <span style="color:#64748b; font-size:13px;">${r.text}</span>
+                    <span class="dropped-placeholder" style="font-weight:600; color:var(--primary);">請將項目拖至此處</span>
+                </div>`;
+            });
+            html += `</div></div></div>`;
+        });
+
+        container.insertAdjacentHTML('beforeend', html);
+        enableDragAndDropEvents();
+    }
+
+    function renderHybridQuestions(choicePool, dragPool, direction) {
+        const container = document.getElementById('practice-container');
+        if(!container) return;
+        container.innerHTML = '<h3>混合模式練習 (選擇題 + 拖曳配對)</h3>';
+        
+        if(choicePool.length > 0) {
+            renderChoiceQuestions(choicePool, direction, 1);
+        }
+        if(dragPool.length > 0) {
+            renderDragQuestions(dragPool, direction, choicePool.length + 1);
+        }
+    }
+
+    function enableDragAndDropEvents() {
+        const draggables = document.querySelectorAll('.draggable-item');
+        draggables.forEach(item => {
+            item.addEventListener('dragstart', e => {
+                e.dataTransfer.setData('text/plain', e.target.innerText);
+                e.dataTransfer.setData('match-key', e.target.getAttribute('data-match-key'));
+            });
+        });
+
+        const targets = document.querySelectorAll('.drop-target');
+        targets.forEach(target => {
+            target.addEventListener('dragover', e => {
+                e.preventDefault();
+                target.classList.add('hovered');
+            });
+            target.addEventListener('dragleave', e => {
+                target.classList.remove('hovered');
+            });
+        });
+    }
+
+    function allowDrop(e) { e.preventDefault(); }
+    function removeHover(e) { e.currentTarget.classList.remove('hovered'); }
+    
+    function drag(e) {
+        e.dataTransfer.setData('text/plain', e.target.innerText);
+        e.dataTransfer.setData('match-key', e.target.getAttribute('data-match-key'));
+    }
+
+    function drop(e, expectedKey) {
+        e.preventDefault();
+        const target = e.currentTarget;
+        target.classList.remove('hovered');
+        const text = e.dataTransfer.getData('text/plain');
+        const matchKey = e.dataTransfer.getData('match-key');
+
+        let placeholder = target.querySelector('.dropped-placeholder');
+        if(placeholder) placeholder.remove();
+
+        let existing = target.querySelector('.dropped-item');
+        if(existing) existing.remove();
+
+        let span = document.createElement('span');
+        span.className = 'dropped-item';
+        span.style.background = '#e0e7ff';
+        span.style.padding = '4px 8px';
+        span.style.borderRadius = '4px';
+        span.style.fontWeight = '600';
+        span.style.color = '#312e81';
+        span.innerText = text;
+        span.setAttribute('data-matched-key', matchKey);
+
+        target.appendChild(span);
+    }
+
+    function checkPracticeAnswers() {
+        let score = 0;
+        let total = 0;
+
+        const choiceCards = document.querySelectorAll('.choice-card');
+        choiceCards.forEach((card) => {
+            total++;
+            let radios = card.querySelectorAll('input[type="radio"]');
+            let selectedVal = null;
+            radios.forEach(r => { if(r.checked) selectedVal = r.value; });
+            
+            let validAnswers = JSON.parse(card.getAttribute('data-valid-answers'));
+            let id = parseInt(card.getAttribute('data-id'));
+            let itemData = masterData.find(d => d.id === id);
+
+            let isCorrect = selectedVal && validAnswers.some(ans => String(ans).toLowerCase() === String(selectedVal).toLowerCase());
+
+            if(isCorrect) {
+                score++;
+                card.style.borderLeftColor = 'var(--success)';
+            } else {
+                card.style.borderLeftColor = 'var(--danger)';
+                addToWrongBook(itemData, '互動練習');
+            }
+        });
+
+        const dragGroups = document.querySelectorAll('.drag-group-card');
+        dragGroups.forEach(group => {
+            const targets = group.querySelectorAll('.drop-target');
+            targets.forEach(t => {
+                total++;
+                let expectedKey = parseInt(t.getAttribute('data-expected-key'));
+                let droppedSpan = t.querySelector('.dropped-item');
+                let matchedKey = droppedSpan ? parseInt(droppedSpan.getAttribute('data-matched-key')) : null;
+                let itemData = masterData.find(d => d.id === expectedKey);
+
+                if(matchedKey && matchedKey === expectedKey) {
+                    score++;
+                    t.style.borderColor = 'var(--success)';
+                    t.style.background = '#f0fdf4';
+                } else {
+                    t.style.borderColor = 'var(--danger)';
+                    t.style.background = '#fef2f2';
+                    addToWrongBook(itemData, '互動練習');
+                }
+            });
+        });
+
+        const feedback = document.getElementById('practice-feedback');
+        if(feedback) {
+            feedback.style.display = 'block';
+            feedback.innerHTML = `批改完成！總得分：<strong>${score} / ${total}</strong> (${total > 0 ? Math.round(score/total*100) : 0}%)。錯題已自動收錄至「錯題簿」中。`;
+        }
+    }
+
+    function toggleDictationRangeConfig() {
+        const rangeEl = document.getElementById('dictation-range');
+        const container = document.getElementById('dictation-detail-container');
+        if(!rangeEl || !container) return;
+
+        const range = rangeEl.value;
+        let html = '';
+        if(range === 'category') {
+            html = `
+                <div>
+                    <span style="font-size:13px; font-weight:600; color:#334155;">選擇主分類:</span>
+                    <div class="checkbox-group">
+                        <label><input type="checkbox" name="dict-cat" value="Section 1: High-frequency language" checked> Section 1: High-frequency language</label>
+                        <label><input type="checkbox" name="dict-cat" value="Section 2: Topic-specific language" checked> Section 2: Topic-specific language</label>
+                    </div>
+                </div>`;
+        } else if(range === 'subcategory') {
+            let cats = [...new Set(masterData.map(d => d.category))];
+            let subHtml = '';
+            cats.forEach(cat => {
+                let subs = [...new Set(masterData.filter(d => d.category === cat).map(d => d.subcategory))];
+                let shortCat = cat.startsWith("Section 1") ? "Section 1" : "Section 2";
+                subHtml += `<div class="sub-section-header">${shortCat}</div>`;
+                subHtml += `<div class="checkbox-group" style="margin-bottom: 10px;">`;
+                subs.forEach(s => {
+                    subHtml += `<label><input type="checkbox" name="dict-sub" value="${s}" checked> ${s}</label>`;
+                });
+                subHtml += `</div>`;
+            });
+
+            html = `
+                <div>
+                    <span style="font-size:13px; font-weight:600; color:#334155;">按主分類分開選擇子分類:</span>
+                    <div style="max-height: 250px; overflow-y: auto; padding: 5px; border: 1px solid var(--border-color); border-radius: 8px; background: #fff;">
+                        ${subHtml}
+                    </div>
+                    <div style="margin-top: 8px; display: flex; gap: 10px;">
+                        <button type="button" class="secondary-btn" style="padding: 4px 10px; font-size: 12px;" onclick="toggleAllSubCheckboxes(true)">全選</button>
+                        <button type="button" class="secondary-btn" style="padding: 4px 10px; font-size: 12px;" onclick="toggleAllSubCheckboxes(false)">全不選</button>
+                    </div>
+                </div>`;
+        } else if(range === 'custom') {
+            html = `<p style="margin:0; font-size:14px; color:#1e293b;">將使用您在「字詞表」中勾選的字詞（目前已選 <strong>${selectedIds.size}</strong> 個）。</p>`;
+        }
+        container.innerHTML = html;
+    }
+
+    function toggleAllSubCheckboxes(status) {
+        document.querySelectorAll('input[name="dict-sub"]').forEach(cb => cb.checked = status);
+    }
+
+    function toggleDictationModeConfig() {
+        const modeEl = document.getElementById('dictation-mode-type');
+        const hybridConfig = document.getElementById('dictation-hybrid-config');
+        if(!modeEl || !hybridConfig) return;
+
+        const mode = modeEl.value;
+        if(mode === 'hybrid') {
+            hybridConfig.style.display = 'block';
+            updateHybridAutoBalance();
+        } else {
+            hybridConfig.style.display = 'none';
+        }
+    }
+
+    function toggleHybridSubConfig() {
+        const subValRadio = document.querySelector('input[name="hybrid-mode-sub"]:checked');
+        const manualInputs = document.getElementById('hybrid-manual-inputs');
+        if(!subValRadio || !manualInputs) return;
+
+        if(subValRadio.value === 'manual') {
+            manualInputs.style.display = 'flex';
+            updateHybridAutoBalance();
+        } else {
+            manualInputs.style.display = 'none';
+        }
+    }
+
+    function updateHybridAutoBalance() {
+        const countEl = document.getElementById('dictation-count');
+        const cnInput = document.getElementById('hybrid-cn-num');
+        const enInput = document.getElementById('hybrid-en-num');
+        if(!countEl || !cnInput || !enInput) return;
+
+        const totalCount = parseInt(countEl.value) || 10;
+        let cnVal = parseInt(cnInput.value) || 0;
+        if(cnVal > totalCount) cnVal = totalCount;
+        if(cnVal < 0) cnVal = 0;
+        
+        cnInput.value = cnVal;
+        enInput.value = totalCount - cnVal;
+    }
+
+    function initDictation() {
+        const modeEl = document.getElementById('dictation-mode-type');
+        const rangeEl = document.getElementById('dictation-range');
+        const countEl = document.getElementById('dictation-count');
+        const resEl = document.getElementById('dictation-result');
+        if(!modeEl || !rangeEl || !countEl) return;
+
+        const mode = modeEl.value;
+        const range = rangeEl.value;
+        const countInput = parseInt(countEl.value) || 10;
+        if(resEl) resEl.style.display = 'none';
+
+        let pool = [];
+        if(range === 'all') {
+            pool = [...masterData];
+        } else if(range === 'category') {
+            const checkedCats = Array.from(document.querySelectorAll('input[name="dict-cat"]:checked')).map(cb => cb.value);
+            if(checkedCats.length === 0) {
+                alert('請至少勾選一個主分類！');
+                return;
+            }
+            pool = masterData.filter(d => checkedCats.includes(d.category));
+        } else if(range === 'subcategory') {
+            const checkedSubs = Array.from(document.querySelectorAll('input[name="dict-sub"]:checked')).map(cb => cb.value);
+            if(checkedSubs.length === 0) {
+                alert('請至少勾選一個子分類！');
+                return;
+            }
+            pool = masterData.filter(d => checkedSubs.includes(d.subcategory));
+        } else if(range === 'custom') {
+            pool = masterData.filter(d => selectedIds.has(d.id));
+            if(pool.length === 0) {
+                alert('您尚未在字詞表中勾選任何字詞，請先至字詞表勾選或切換其他範圍！');
+                return;
+            }
+        }
+
+        if(pool.length === 0) {
+            alert('找不到符合此條件的詞彙，請重新選擇。');
+            return;
+        }
+
+        pool.sort(() => 0.5 - Math.random());
+        let selectedPool = pool.slice(0, Math.min(countInput, pool.length));
+
+        currentDictationItems = [];
+        if(mode === 'cn-to-en' || mode === 'en-to-cn') {
+            selectedPool.forEach(item => {
+                currentDictationItems.push({ item: item, dir: mode });
+            });
+        } else {
+            const subValRadio = document.querySelector('input[name="hybrid-mode-sub"]:checked');
+            let subVal = subValRadio ? subValRadio.value : 'random';
+            if(subVal === 'random') {
+                selectedPool.forEach(item => {
+                    let d = Math.random() > 0.5 ? 'cn-to-en' : 'en-to-cn';
+                    currentDictationItems.push({ item: item, dir: d });
+                });
+            } else {
+                let cnElem = document.getElementById('hybrid-cn-num');
+                let enElem = document.getElementById('hybrid-en-num');
+                let cnNum = cnElem ? parseInt(cnElem.value) || 0 : 0;
+                let enNum = enElem ? parseInt(enElem.value) || 0 : 0;
+                
+                if(cnNum > selectedPool.length) cnNum = selectedPool.length;
+                enNum = selectedPool.length - cnNum;
+
+                selectedPool.forEach((item, idx) => {
+                    let d = idx < cnNum ? 'cn-to-en' : 'en-to-cn';
+                    currentDictationItems.push({ item: item, dir: d });
+                });
+                currentDictationItems.sort(() => 0.5 - Math.random());
+            }
+        }
+
+        renderDictationTable();
+    }
+
+    function randomizeDictationItems() {
+        currentDictationItems.sort(() => 0.5 - Math.random());
+        renderDictationTable();
+    }
+
+    function renderDictationTable() {
+        const container = document.getElementById('dictation-container');
+        if(!container) return;
+
+        let html = `<div style="margin-bottom: 15px;">
+            <button class="secondary-btn" style="padding: 6px 14px; font-size: 13px;" onclick="randomizeDictationItems()">🔀 隨機排序現有題目</button>
+        </div>`;
+
+        html += `<table><thead><tr><th>編號</th><th>問題</th><th>請填寫答案 (Answer)</th></tr></thead><tbody>`;
+        currentDictationItems.forEach((entry, index) => {
+            let item = entry.item;
+            let isSec1 = item.shortCategory.includes("Section 1");
+            let mainBadgeClass = isSec1 ? "badge-sec1-main" : "badge-sec2-main";
+            let subBadgeClass = isSec1 ? "badge-sec1-sub" : "badge-sec2-sub";
+
+            let promptText = "";
+            if(entry.dir === 'cn-to-en') {
+                promptText = `<strong>${item.term}</strong><br><span class="badge ${mainBadgeClass}">${item.shortCategory}</span> <span class="badge ${subBadgeClass}">${item.subcategory}</span>`;
+            } else {
+                promptText = `<strong>${item.trans}</strong><br><span class="badge ${mainBadgeClass}">${item.shortCategory}</span> <span class="badge ${subBadgeClass}">${item.subcategory}</span>`;
+            }
+
+            html += `<tr>
+                <td style="width:60px;">${index + 1}</td>
+                <td>${promptText}</td>
+                <td><input type="text" class="dictation-input" id="dict-input-${index}" data-id="${item.id}"></td>
+            </tr>`;
+        });
+        html += `</tbody></table>`;
+        container.innerHTML = html;
+        const actionsEl = document.getElementById('dictation-actions');
+        if(actionsEl) actionsEl.style.display = 'block';
+    }
+
+    function checkDictation() {
+        let score = 0;
+        currentDictationItems.forEach((entry, index) => {
+            let item = entry.item;
+            let dir = entry.dir;
+            let inputElem = document.getElementById(`dict-input-${index}`);
+            if(!inputElem) return;
+
+            let userVal = inputElem.value.trim();
+            let validList = (dir === 'cn-to-en') ? item.transList : item.termsList;
+
+            let isCorrect = validList.some(validAns => {
+                if (dir === 'cn-to-en') {
+                    return userVal.toLowerCase() === String(validAns).toLowerCase();
+                } else {
+                    return userVal === String(validAns);
+                }
+            });
+
+            if(isCorrect) {
+                score++;
+                inputElem.style.borderColor = 'var(--success)';
+                inputElem.style.background = '#f0fdf4';
+            } else {
+                inputElem.style.borderColor = 'var(--danger)';
+                inputElem.style.background = '#fef2f2';
+                inputElem.title = `正確答案之一：${validList.join(' 或 ')}`;
+                addToWrongBook(item, '默書模式');
+            }
+        });
+
+        const res = document.getElementById('dictation-result');
+        if(res) {
+            res.style.display = 'block';
+            res.innerHTML = `默書批改結果：<strong>${score} / ${currentDictationItems.length}</strong> 分。答錯的項目已記錄至錯題簿。`;
+        }
+    }
+
+    function addToWrongBook(itemData, sourceMode) {
+        if(!itemData) return;
+        let exists = wrongBook.some(w => w.item.id === itemData.id && w.source === sourceMode);
+        if(!exists) {
+            wrongBook.push({ item: itemData, source: sourceMode });
+        }
+        const wcEl = document.getElementById('wrong-count');
+        if(wcEl) wcEl.innerText = wrongBook.length;
+    }
+
+    function renderWrongBook() {
+        const tbody = document.getElementById('wrong-table-body');
+        const wcEl = document.getElementById('wrong-count');
+        if(!tbody) return;
+        tbody.innerHTML = '';
+        if(wcEl) wcEl.innerText = wrongBook.length;
+
+        if(wrongBook.length === 0) {
+            tbody.innerHTML = `<tr><td colspan="7" style="text-align:center; color:#64748b;">目前沒有錯題記錄，太棒了！繼續保持！</td></tr>`;
+            return;
+        }
+
+        wrongBook.forEach((entry, idx) => {
+            const item = entry.item;
+            let isSec1 = item.shortCategory.includes("Section 1");
+            let mainBadgeClass = isSec1 ? "badge-sec1-main" : "badge-sec2-main";
+            let subBadgeClass = isSec1 ? "badge-sec1-sub" : "badge-sec2-sub";
+
+            const tr = document.createElement('tr');
+            tr.innerHTML = `
+                <td>${idx + 1}</td>
+                <td><span class="badge ${mainBadgeClass}">${item.shortCategory}</span></td>
+                <td><span class="badge ${subBadgeClass}">${item.subcategory}</span></td>
+                <td><strong>${item.term}</strong></td>
+                <td>${item.trans}</td>
+                <td><span class="badge badge-sub-neutral">${entry.source}</span></td>
+                <td><button class="secondary-btn" style="padding:4px 8px; font-size:12px;" onclick="removeWrongItem(${idx})">移除</button></td>
+            `;
+            tbody.appendChild(tr);
+        });
+    }
+
+    function removeWrongItem(index) {
+        wrongBook.splice(index, 1);
+        renderWrongBook();
+    }
+
+    function clearWrongBook() {
+        if(confirm('確定要清空所有錯題記錄嗎？')) {
+            wrongBook = [];
+            renderWrongBook();
+        }
+    }
+
+    function exportWrongWords(type) {
+        if(wrongBook.length === 0) {
+            alert('目前沒有錯題可供匯出！');
+            return;
+        }
+
+        if(type === 'word') {
+            let htmlContent = `<html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:w="urn:schemas-microsoft-com:office:word" xmlns="http://www.w3.org/1999/xhtml">
+            <head><meta charset="utf-8"><title>錯題清單</title></head>
+            <body style="font-family: 'Microsoft JhengHei', Arial;">
+                <h2 style="text-align:center; color:#1e1b4b;">GCSE 自習系統 - 錯題複習清單</h2>
+                <table border="1" cellspacing="0" cellpadding="8" style="width:100%; border-collapse:collapse; border-color:#cbd5e1;">
+                    <tr style="background:#f1f5f9;">
+                        <th>編號</th><th>主分類</th><th>子分類</th><th>中文詞彙 / 短語</th><th>英文翻譯</th><th>錯誤來源</th>
+                    </tr>`;
+            
+            wrongBook.forEach((entry, i) => {
+                htmlContent += `<tr>
+                    <td>${i + 1}</td>
+                    <td>${entry.item.shortCategory}</td>
+                    <td>${entry.item.subcategory}</td>
+                    <td>${entry.item.term}</td>
+                    <td>${entry.item.trans}</td>
+                    <td>${entry.source}</td>
+                </tr>`;
+            });
+            htmlContent += `</table></body></html>`;
+
+            let blob = new Blob(['\ufeff' + htmlContent], { type: 'application/msword' });
+            let url = URL.createObjectURL(blob);
+            let a = document.createElement('a');
+            a.href = url;
+            a.download = `GCSE_中文錯題簿_${new Date().toISOString().slice(0,10)}.doc`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+        } else if(type === 'excel') {
+            let csvContent = "\uFEFF編號,主分類,子分類,中文詞彙,英文翻譯,錯誤來源\n";
+            wrongBook.forEach((entry, i) => {
+                let row = [
+                    i + 1,
+                    `"${entry.item.shortCategory}"`,
+                    `"${entry.item.subcategory}"`,
+                    `"${entry.item.term}"`,
+                    `"${entry.item.trans}"`,
+                    `"${entry.source}"`
+                ];
+                csvContent += row.join(",") + "\n";
+            });
+
+            let blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+            let url = URL.createObjectURL(blob);
+            let a = document.createElement('a');
+            a.href = url;
+            a.download = `GCSE_中文錯題簿_${new Date().toISOString().slice(0,10)}.csv`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+        }
+    }
+</script>
+
+</body>
+</html>
