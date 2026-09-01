@@ -1,0 +1,2194 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GCE自習系統</title>
+    <style>
+        :root {
+            --primary: #4f46e5;
+            --primary-hover: #4338ca;
+            --secondary: #0ea5e9;
+            --success: #10b981;
+            --danger: #ef4444;
+            --warning: #f59e0b;
+            --bg-color: #f8fafc;
+            --card-bg: #ffffff;
+            --text-color: #1e293b;
+            --border-color: #e2e8f0;
+            
+            --sec1-color: #1d4ed8;
+            --sec1-bg: #eff6ff;
+            --sec1-border: #bfdbfe;
+
+            --sec2-color: #047857;
+            --sec2-bg: #ecfdf5;
+            --sec2-border: #a7f3d0;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            margin: 0;
+            padding: 20px;
+            line-height: 1.5;
+        }
+
+        .container {
+            max-width: 1300px;
+            margin: 0 auto;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 25px;
+            position: relative;
+        }
+
+        header h1 {
+            color: #1e1b4b;
+            margin-bottom: 5px;
+            font-size: 2rem;
+        }
+
+        header p {
+            color: #64748b;
+            font-size: 1rem;
+        }
+
+        .home-btn {
+            position: absolute;
+            left: 0;
+            top: 50%;
+            transform: translateY(-50%);
+            background-color: #64748b;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 14px;
+            text-decoration: none;
+            transition: background-color 0.2s;
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .home-btn:hover {
+            background-color: #475569;
+        }
+
+        @media (max-width: 768px) {
+            header {
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+            }
+            .home-btn {
+                position: static;
+                transform: none;
+                margin-bottom: 15px;
+            }
+        }
+
+        .tabs {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 25px;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+
+        .tab-btn {
+            padding: 12px 24px;
+            background-color: #e2e8f0;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 600;
+            color: #475569;
+            transition: all 0.2s ease;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+        }
+
+        .tab-btn.active {
+            background-color: var(--primary);
+            color: white;
+            box-shadow: 0 4px 6px -1px rgba(79, 70, 229, 0.3);
+        }
+
+        .section {
+            display: none;
+            background: var(--card-bg);
+            padding: 30px;
+            border-radius: 16px;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.05), 0 4px 6px -4px rgba(0, 0, 0, 0.05);
+            margin-bottom: 30px;
+        }
+
+        .section.active {
+            display: block;
+            animation: fadeIn 0.3s ease-in-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(6px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        h2 {
+            margin-top: 0;
+            color: #1e1b4b;
+            font-size: 1.5rem;
+            border-bottom: 2px solid #f1f5f9;
+            padding-bottom: 12px;
+            margin-bottom: 20px;
+        }
+
+        .controls {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            margin-bottom: 25px;
+            align-items: center;
+            background: #f8fafc;
+            padding: 20px;
+            border-radius: 12px;
+            border: 1px solid var(--border-color);
+        }
+
+        .controls label {
+            font-weight: 600;
+            font-size: 14px;
+            color: #334155;
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+
+        .controls select, .controls button, .controls input {
+            padding: 10px 14px;
+            font-size: 14px;
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            background-color: white;
+            color: #334155;
+            outline: none;
+            transition: border-color 0.2s;
+        }
+
+        .controls select:focus, .controls input:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
+        }
+
+        button.action-btn {
+            background-color: var(--primary);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: background-color 0.2s;
+        }
+
+        button.action-btn:hover {
+            background-color: var(--primary-hover);
+        }
+
+        button.secondary-btn {
+            background-color: #64748b;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+        }
+
+        button.secondary-btn:hover {
+            background-color: #475569;
+        }
+
+        .table-responsive {
+            max-height: 550px;
+            overflow-y: auto;
+            border-radius: 8px;
+            border: 1px solid var(--border-color);
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            text-align: left;
+            background: white;
+        }
+
+        th, td {
+            padding: 14px 16px;
+            border-bottom: 1px solid var(--border-color);
+            font-size: 14px;
+        }
+
+        th {
+            background-color: #f1f5f9;
+            color: #334155;
+            font-weight: 600;
+            position: sticky;
+            top: 0;
+            z-index: 10;
+        }
+
+        tr:hover {
+            background-color: #f8fafc;
+        }
+
+        .exercise-config-box {
+            background: #ffffff;
+            border: 1px solid var(--border-color);
+            padding: 20px;
+            border-radius: 12px;
+            margin-bottom: 25px;
+        }
+
+        .config-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 15px;
+            margin-bottom: 15px;
+        }
+
+        .question-card {
+            background: #fff;
+            border: 1px solid var(--border-color);
+            padding: 20px;
+            margin-bottom: 20px;
+            border-radius: 10px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.02);
+            border-left: 5px solid var(--primary);
+        }
+
+        .question-card p {
+            margin-top: 0;
+            font-size: 16px;
+            font-weight: 600;
+            color: #1e293b;
+        }
+
+        .drag-container {
+            display: flex;
+            gap: 20px;
+            justify-content: space-between;
+            margin-top: 15px;
+            flex-wrap: wrap;
+        }
+
+        .drag-list, .drop-list {
+            flex: 1;
+            min-width: 280px;
+            min-height: 350px;
+            background: #f8fafc;
+            padding: 15px;
+            border: 2px dashed #cbd5e1;
+            border-radius: 10px;
+        }
+
+        .draggable-item {
+            background: white;
+            padding: 12px;
+            margin-bottom: 10px;
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            cursor: grab;
+            font-weight: 500;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+            transition: transform 0.1s, box-shadow 0.1s;
+        }
+
+        .draggable-item:active {
+            cursor: grabbing;
+            transform: scale(0.98);
+        }
+
+        .drop-target {
+            padding: 10px;
+            margin-bottom: 12px;
+            background: #fff;
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            min-height: 45px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .drop-target.hovered {
+            background-color: #e0e7ff;
+            border-color: var(--primary);
+        }
+
+        .feedback {
+            margin-top: 15px;
+            font-weight: 600;
+            padding: 10px 15px;
+            border-radius: 6px;
+            background: #f1f5f9;
+        }
+
+        .dictation-input {
+            padding: 8px 12px;
+            font-size: 16px;
+            width: 260px;
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 3px 8px;
+            font-size: 11px;
+            font-weight: 600;
+            border-radius: 4px;
+        }
+
+        .badge-theme-main {
+            background-color: var(--sec1-color);
+            color: #ffffff;
+        }
+        .badge-theme-sub {
+            background-color: var(--sec1-bg);
+            color: var(--sec1-color);
+            border: 1px solid var(--sec1-border);
+        }
+
+        .badge-sub-neutral {
+            background-color: #f1f5f9;
+            color: #475569;
+            border: 1px solid #cbd5e1;
+        }
+
+        .checkbox-group {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            background: #f8fafc;
+            padding: 12px 16px;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            margin-top: 5px;
+        }
+
+        .checkbox-group label {
+            font-weight: normal;
+            flex-direction: row;
+            align-items: center;
+            gap: 6px;
+            cursor: pointer;
+        }
+
+        .notice-banner {
+            background-color: #fffbeb;
+            border: 1px solid #fef3c7;
+            color: #92400e;
+            padding: 12px 18px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .export-buttons {
+            display: flex;
+            gap: 10px;
+            margin-top: 15px;
+        }
+
+        .checkbox-cell {
+            text-align: center;
+            width: 40px;
+        }
+
+        .sub-section-header {
+            font-weight: bold;
+            background-color: #f1f5f9;
+            color: #334155;
+            padding: 8px 12px;
+            margin-top: 10px;
+            margin-bottom: 5px;
+            border-radius: 4px;
+        }
+
+        .toggle-btn {
+            background: none;
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+            cursor: pointer;
+            padding: 2px 6px;
+            font-size: 11px;
+            color: #64748b;
+            margin-left: 5px;
+            transition: all 0.2s;
+        }
+        .toggle-btn:hover {
+            background-color: #e2e8f0;
+            color: var(--text-color);
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <header>
+        <a href="index.html" class="home-btn">← 回到主頁</a>
+        <h1>GCE 自習系統</h1>
+        <p>Pearson Edexcel GCE Chinese Vocabulary Revision</p>
+    </header>
+    
+    <div class="tabs">
+        <button class="tab-btn active" onclick="switchTab(event, 'wordlist-section')">1. 字詞表與自選</button>
+        <button class="tab-btn" onclick="switchTab(event, 'practice-section')">2. 互動練習中心</button>
+        <button class="tab-btn" onclick="switchTab(event, 'dictation-section')">3. 默書模式</button>
+        <button class="tab-btn" onclick="switchTab(event, 'wrong-book-section')">4. 錯題簿與匯出 (<span id="wrong-count">0</span>)</button>
+    </div>
+
+    <!-- 1. 字詞表專區 -->
+    <div id="wordlist-section" class="section active">
+        <h2>字詞表</h2>
+        <div class="controls">
+            <label>主題篩選： 
+                <select id="category-filter" onchange="onCategoryFilterChange()">
+                    <option value="all">全部主題</option>
+                    <option value="Theme 1">Theme 1: Changes in contemporary Chinese society</option>
+                    <option value="Theme 2">Theme 2: Chinese culture</option>
+                    <option value="Theme 3">Theme 3: Evolving Chinese society</option>
+                    <option value="Theme 4">Theme 4: The impact of reform and opening up in 1978 on China</option>
+                </select>
+            </label>
+            <label>子主題篩選: 
+                <select id="subcategory-filter" onchange="filterWordList()">
+                    <option value="all">全部子主題</option>
+                </select>
+            </label>
+            <label>關鍵字搜尋:
+                <input type="text" id="search-input" placeholder="輸入中文或英文..." onkeyup="filterWordList()">
+            </label>
+            <button class="secondary-btn" onclick="selectAllFiltered(true)">全選篩選結果</button>
+            <button class="secondary-btn" onclick="selectAllFiltered(false)">取消全選</button>
+        </div>
+        <p style="font-size: 13px; color: #64748b; margin-top: -10px; margin-bottom: 15px;">
+            提示：您可以在表格左側勾選特定字詞，然後在「互動練習」或「默書模式」中選擇**「自選（已勾選項目）」**進行針對性訓練！已選 <span id="selected-count" style="font-weight:bold; color:var(--primary)">0</span> 個詞彙。
+        </p>
+        <div class="table-responsive">
+            <table id="word-table">
+                <thead>
+                    <tr id="word-table-header-row">
+                        <th class="checkbox-cell"><input type="checkbox" id="select-all-checkbox" onclick="toggleSelectAll(this)"></th>
+                        <th>編號</th>
+                        <th>中文詞彙 / 短語</th>
+                        <th>英文翻譯 (English Translation)</th>
+                        <th class="th-cat">
+                            主題 
+                            <button class="toggle-btn" onclick="toggleColumn('cat')" title="隱藏/顯示主題">👁️</button>
+                        </th>
+                        <th class="th-sub">
+                            子主題 
+                            <button class="toggle-btn" onclick="toggleColumn('sub')" title="隱藏/顯示子主題">👁️</button>
+                        </th>
+                    </tr>
+                </thead>
+                <tbody id="word-table-body">
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- 2. 互動練習專區 -->
+    <div id="practice-section" class="section">
+        <h2>互動練習中心</h2>
+        
+        <div class="exercise-config-box">
+            <div class="config-grid">
+                <label>練習類型:
+                    <select id="practice-type" onchange="toggleSourceConfig()">
+                        <option value="choice">選擇題 (多選一)</option>
+                        <option value="drag">拖曳配對</option>
+                        <option value="hybrid">混合模式 (選擇題 + 拖曳)</option>
+                    </select>
+                </label>
+                <label>翻譯方向:
+                    <select id="practice-direction">
+                        <option value="cn-to-en">中譯英 (看中文選英文)</option>
+                        <option value="en-to-cn">英譯中 (看英文選中文)</option>
+                        <option value="random">混合方向 (隨機)</option>
+                    </select>
+                </label>
+                <label>範圍選擇:
+                    <select id="practice-source" onchange="toggleSourceConfig()">
+                        <option value="all">全部詞庫</option>
+                        <option value="category">按主題篩選</option>
+                        <option value="subcategory">按子主題篩選</option>
+                        <option value="custom">自選（已勾選項目）</option>
+                    </select>
+                </label>
+                <label>每組題數:
+                    <input type="number" id="num-total" value="10" min="1" max="50">
+                </label>
+            </div>
+
+            <div id="source-detail-container" style="margin-top: 15px; padding-top: 15px; border-top: 1px dashed var(--border-color);">
+            </div>
+
+            <div style="margin-top: 20px; display: flex; gap: 15px; align-items: center;">
+                <button class="action-btn" onclick="generatePractice()">開始練習</button>
+                <span id="practice-info-text" style="font-size: 14px; color: #64748b;"></span>
+            </div>
+        </div>
+
+        <div id="practice-container">
+        </div>
+        <div id="practice-actions" style="display:none; margin-top: 20px;">
+            <button class="action-btn" onclick="checkPracticeAnswers()">提交批改答案</button>
+            <button class="secondary-btn" onclick="generatePractice()">生成另一組新練習</button>
+        </div>
+        <div id="practice-feedback" class="feedback" style="display:none;"></div>
+    </div>
+
+    <!-- 3. 默書模式專區 -->
+    <div id="dictation-section" class="section">
+        <h2>默書模式</h2>
+        <div class="exercise-config-box">
+            <div class="config-grid">
+                <label>默書方向: 
+                    <select id="dictation-mode-type" onchange="toggleDictationModeConfig()">
+                        <option value="cn-to-en">只顯示中文 (默寫英文)</option>
+                        <option value="en-to-cn">只顯示英文 (默寫中文)</option>
+                        <option value="hybrid">混合模式 (中譯英 + 英譯中)</option>
+                    </select>
+                </label>
+                <label>範圍選擇: 
+                    <select id="dictation-range" onchange="toggleDictationRangeConfig()">
+                        <option value="all">全部詞庫</option>
+                        <option value="category">按主題篩選</option>
+                        <option value="subcategory">按子主題篩選</option>
+                        <option value="custom">自選（已勾選項目） (<span id="dict-custom-count">0</span>)</option>
+                    </select>
+                </label>
+                <label>默書總題數:
+                    <input type="number" id="dictation-count" value="10" min="1" max="50" oninput="updateHybridAutoBalance()">
+                </label>
+            </div>
+
+            <div id="dictation-hybrid-config" style="display:none; margin-top: 15px; padding-top: 15px; border-top: 1px dashed var(--border-color);">
+                <span style="font-size:13px; font-weight:600; color:#334155;">混合方向分配方式：</span>
+                <div style="display:flex; gap:15px; flex-wrap:wrap; margin-top: 8px;">
+                    <label style="flex-direction:row; align-items:center; gap:6px; cursor:pointer; font-weight:normal;">
+                        <input type="radio" name="hybrid-mode-sub" value="random" checked onchange="toggleHybridSubConfig()"> 隨機混合分配
+                    </label>
+                    <label style="flex-direction:row; align-items:center; gap:6px; cursor:pointer; font-weight:normal;">
+                        <input type="radio" name="hybrid-mode-sub" value="manual" onchange="toggleHybridSubConfig()"> 自訂題數比例
+                    </label>
+                </div>
+                <div id="hybrid-manual-inputs" style="display:none; margin-top: 10px; display: flex; gap: 15px; flex-wrap: wrap;">
+                    <label>中譯英題數: <input type="number" id="hybrid-cn-num" value="5" min="0" max="50" style="width:80px;" oninput="updateHybridAutoBalance()"></label>
+                    <label>英譯中題數 (自動計算): <input type="number" id="hybrid-en-num" value="5" readonly style="width:80px; background:#f1f5f9;"></label>
+                </div>
+            </div>
+
+            <div id="dictation-detail-container" style="margin-top: 15px; padding-top: 15px; border-top: 1px dashed var(--border-color);">
+            </div>
+
+            <div style="margin-top: 20px; display: flex; gap: 15px; align-items: center;">
+                <button class="action-btn" onclick="initDictation()">開始默書</button>
+            </div>
+        </div>
+        
+        <div id="dictation-container">
+        </div>
+        <div id="dictation-actions" style="display:none; margin-top: 20px;">
+            <button class="action-btn" onclick="checkDictation()">提交批改默書</button>
+            <button class="secondary-btn" onclick="initDictation()">生成另一組默書</button>
+        </div>
+        <div id="dictation-result" class="feedback" style="display:none; margin-top:15px;"></div>
+    </div>
+
+    <!-- 4. 錯題簿專區 -->
+    <div id="wrong-book-section" class="section">
+        <h2>錯題簿</h2>
+        <div class="notice-banner">
+            <span>⚠️ <strong>貼心提醒：</strong>錯題簿記錄僅保存在當前瀏覽器工作階段中，重新整理或關閉頁面後記錄將會歸零。</span>
+            <div class="export-buttons">
+                <button class="secondary-btn" onclick="exportWrongWords('word')" style="padding: 6px 12px; font-size: 13px;">匯出為 Word (.doc)</button>
+                <button class="secondary-btn" onclick="exportWrongWords('excel')" style="padding: 6px 12px; font-size: 13px;">匯出為 Excel (.csv)</button>
+            </div>
+        </div>
+        
+        <div class="table-responsive">
+            <table id="wrong-table">
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>主題</th>
+                        <th>子主題</th>
+                        <th>中文詞彙 / 短語</th>
+                        <th>英文翻譯</th>
+                        <th>錯誤來源</th>
+                        <th>操作</th>
+                    </tr>
+                </thead>
+                <tbody id="wrong-table-body">
+                    <tr><td colspan="7" style="text-align:center; color:#64748b;">目前沒有錯題記錄，太棒了！繼續保持！</td></tr>
+                </tbody>
+            </table>
+        </div>
+        <div style="margin-top: 20px;">
+            <button class="secondary-btn" onclick="clearWrongBook()">清空錯題簿</button>
+        </div>
+    </div>
+
+</div>
+
+<script>
+    let selectedIds = new Set();
+    let wrongBook = [];
+    let currentQuestions = [];
+    let currentDictationItems = [];
+    let hiddenColumns = { cat: false, sub: false };
+    let masterData = [];
+
+    function parseSynonyms(text) {
+        if (text === null || text === undefined) return [];
+        let str = String(text);
+        let parts = str.split(/[\/、,，]|(?:\s*,\s*)|(?:\sand\s)/).map(s => s.trim()).filter(s => s.length > 0);
+        if (parts.length === 0) parts = [str.trim()];
+        return parts;
+    }
+
+    const rawData = [
+        // Theme 1 - Family
+        ["Theme 1", "Family", "老齡化/老化", "ageing"],
+        ["Theme 1", "Family", "氣氛", "atmosphere"],
+        ["Theme 1", "Family", "出生率", "birth rate"],
+        ["Theme 1", "Family", "負擔/擔子", "burden"],
+        ["Theme 1", "Family", "熱鬧", "busy, lively"],
+        ["Theme 1", "Family", "慈善機構", "charitable organisation"],
+        ["Theme 1", "Family", "親密", "close"],
+        ["Theme 1", "Family", "體貼", "considerate"],
+        ["Theme 1", "Family", "離婚", "divorce"],
+        ["Theme 1", "Family", "獨居老人", "elderly person living alone"],
+        ["Theme 1", "Family", "感情/情感", "emotion/affection"],
+        ["Theme 1", "Family", "空巢", "'empty nest'"],
+        ["Theme 1", "Family", "娛樂", "entertainment"],
+        ["Theme 1", "Family", "設施/設備", "facilities"],
+        ["Theme 1", "Family", "計劃生育/家庭計劃", "family planning"],
+        ["Theme 1", "Family", "家庭規模", "family size"],
+        ["Theme 1", "Family", "孝順", "filial obedience"],
+        ["Theme 1", "Family", "財務", "finances"],
+        ["Theme 1", "Family", "摩擦", "friction"],
+        ["Theme 1", "Family", "幸福", "happiness"],
+        ["Theme 1", "Family", "和諧", "harmonious"],
+        ["Theme 1", "Family", "家庭/住戶", "household"],
+        ["Theme 1", "Family", "主婦", "housewife"],
+        ["Theme 1", "Family", "夫婦/夫妻", "husband and wife / a couple"],
+        ["Theme 1", "Family", "獨立", "independent"],
+        ["Theme 1", "Family", "晚婚/遲婚", "late marriage"],
+        ["Theme 1", "Family", "生命", "life"],
+        ["Theme 1", "Family", "孤獨/孤單", "lonely"],
+        ["Theme 1", "Family", "長壽", "long life"],
+        ["Theme 1", "Family", "婚姻", "marriage"],
+        ["Theme 1", "Family", "媒人/做媒", "matchmaker / intermediary"],
+        ["Theme 1", "Family", "醫療", "medical care"],
+        ["Theme 1", "Family", "記憶/回憶", "memories"],
+        ["Theme 1", "Family", "保姆/傭工", "nanny / helper"],
+        ["Theme 1", "Family", "核心家庭", "nuclear family"],
+        ["Theme 1", "Family", "長輩", "older generation"],
+        ["Theme 1", "Family", "獨生子女", "only child"],
+        ["Theme 1", "Family", "平民/居民", "ordinary people / residents"],
+        ["Theme 1", "Family", "親子關係/父母子女關係", "parent-child relationship"],
+        ["Theme 1", "Family", "退休金/養老金", "pension"],
+        ["Theme 1", "Family", "財產/物業", "property"],
+        ["Theme 1", "Family", "心理", "psyche / mind"],
+        ["Theme 1", "Family", "親人/親戚", "relative"],
+        ["Theme 1", "Family", "捨不得", "reluctant"],
+        ["Theme 1", "Family", "老人院/安老院", "residential care home for the elderly"],
+        ["Theme 1", "Family", "美滿", "satisfactory (life)"],
+        ["Theme 1", "Family", "養老服務", "services for the aged"],
+        ["Theme 1", "Family", "單身", "single"],
+        ["Theme 1", "Family", "社會保障", "social security"],
+        ["Theme 1", "Family", "三代同堂", "three generations under the same roof"],
+        ["Theme 1", "Family", "陪伴", "to accompany"],
+        ["Theme 1", "Family", "安排", "to arrange"],
+        ["Theme 1", "Family", "關心", "to be concerned about"],
+        ["Theme 1", "Family", "包容", "to be tolerant"],
+        ["Theme 1", "Family", "依靠/依賴", "to depend on / rely on"],
+        ["Theme 1", "Family", "管教", "to discipline (a child)"],
+        ["Theme 1", "Family", "安享晚年", "to enjoy later life"],
+        ["Theme 1", "Family", "患病", "to fall ill"],
+        ["Theme 1", "Family", "原諒", "to forgive"],
+        ["Theme 1", "Family", "相處", "to get on (with someone)"],
+        ["Theme 1", "Family", "讓座", "to give up one's seat"],
+        ["Theme 1", "Family", "問候/問好", "to greet"],
+        ["Theme 1", "Family", "成長/長大", "to grow up"],
+        ["Theme 1", "Family", "改善", "to improve"],
+        ["Theme 1", "Family", "居住", "to live (dwell)"],
+        ["Theme 1", "Family", "組織", "to organise"],
+        ["Theme 1", "Family", "尊敬", "to pay respect"],
+        ["Theme 1", "Family", "提供", "to provide"],
+        ["Theme 1", "Family", "寵壞/溺愛", "to spoil (a child)"],
+        ["Theme 1", "Family", "對待", "treatment"],
+        ["Theme 1", "Family", "未婚", "unmarried"],
+        ["Theme 1", "Family", "教養", "upbringing"],
+        ["Theme 1", "Family", "價值觀", "values"],
+        ["Theme 1", "Family", "溫暖", "warm"],
+        ["Theme 1", "Family", "福利制度", "welfare system"],
+
+        // Theme 1 - Education & Work
+        ["Theme 1", "Education & Work", "學歷", "academic qualification"],
+        ["Theme 1", "Education & Work", "成就", "achievement"],
+        ["Theme 1", "Education & Work", "冒險精神", "adventurous"],
+        ["Theme 1", "Education & Work", "學徒", "apprentice"],
+        ["Theme 1", "Education & Work", "老闆/上司", "boss"],
+        ["Theme 1", "Education & Work", "繁忙", "busy"],
+        ["Theme 1", "Education & Work", "校園", "campus / school grounds"],
+        ["Theme 1", "Education & Work", "能力/本領", "capability"],
+        ["Theme 1", "Education & Work", "事業", "career"],
+        ["Theme 1", "Education & Work", "證書", "certificate"],
+        ["Theme 1", "Education & Work", "挑戰", "challenge"],
+        ["Theme 1", "Education & Work", "公務員", "civil servant"],
+        ["Theme 1", "Education & Work", "同事", "colleague"],
+        ["Theme 1", "Education & Work", "溝通能力", "communication skills"],
+        ["Theme 1", "Education & Work", "競爭", "competition"],
+        ["Theme 1", "Education & Work", "課程", "course / programme"],
+        ["Theme 1", "Education & Work", "好奇心", "curiosity"],
+        ["Theme 1", "Education & Work", "簡歷/履歷", "curriculum vitae / CV"],
+        ["Theme 1", "Education & Work", "顧客", "customer"],
+        ["Theme 1", "Education & Work", "討論", "discussion"],
+        ["Theme 1", "Education & Work", "毒品", "drugs"],
+        ["Theme 1", "Education & Work", "效率", "efficiency"],
+        ["Theme 1", "Education & Work", "雇員", "employee"],
+        ["Theme 1", "Education & Work", "專家", "expert"],
+        ["Theme 1", "Education & Work", "課外活動", "extracurricular activities"],
+        ["Theme 1", "Education & Work", "流利/流暢", "fluent (in a language)"],
+        ["Theme 1", "Education & Work", "自由", "freedom"],
+        ["Theme 1", "Education & Work", "友誼/友情", "friendship"],
+        ["Theme 1", "Education & Work", "辛苦", "hard / tough"],
+        ["Theme 1", "Education & Work", "宿舍", "hostel, dormitory, hall of residence"],
+        ["Theme 1", "Education & Work", "創新/創意", "innovative / creative"],
+        ["Theme 1", "Education & Work", "工作滿足感", "job satisfaction"],
+        ["Theme 1", "Education & Work", "幼兒園/幼稚園", "kindergarten"],
+        ["Theme 1", "Education & Work", "知識", "knowledge"],
+        ["Theme 1", "Education & Work", "有學問/博學", "learned (person)"],
+        ["Theme 1", "Education & Work", "空閒時間/閒暇時間/休閒時間", "leisure time"],
+        ["Theme 1", "Education & Work", "管理", "management"],
+        ["Theme 1", "Education & Work", "體力勞動", "manual labour"],
+        ["Theme 1", "Education & Work", "辦公室", "office"],
+        ["Theme 1", "Education & Work", "潛力/潛能/潛質", "potential"],
+        ["Theme 1", "Education & Work", "行業", "professions and trades"],
+        ["Theme 1", "Education & Work", "教授", "professor"],
+        ["Theme 1", "Education & Work", "升遷", "promotion (in a job)"],
+        ["Theme 1", "Education & Work", "招聘代理/招聘機構", "recruitment agency"],
+        ["Theme 1", "Education & Work", "研究", "research"],
+        ["Theme 1", "Education & Work", "辭職", "resignation"],
+        ["Theme 1", "Education & Work", "學者", "scholar"],
+        ["Theme 1", "Education & Work", "獎學金", "scholarship"],
+        ["Theme 1", "Education & Work", "校園欺凌", "school bullying"],
+        ["Theme 1", "Education & Work", "秘書", "secretary"],
+        ["Theme 1", "Education & Work", "自信", "self-confident / confidence"],
+        ["Theme 1", "Education & Work", "專業", "specialism"],
+        ["Theme 1", "Education & Work", "填鴨方式", "spoon-feeding approach"],
+        ["Theme 1", "Education & Work", "奮鬥", "struggle"],
+        ["Theme 1", "Education & Work", "人才", "talented / qualified people"],
+        ["Theme 1", "Education & Work", "請假", "to ask for leave / holiday"],
+        ["Theme 1", "Education & Work", "聽講座/上課", "to attend a lecture"],
+        ["Theme 1", "Education & Work", "失業", "to be unemployed"],
+        ["Theme 1", "Education & Work", "適應", "to fit in with"],
+        ["Theme 1", "Education & Work", "戒毒", "to give up drugs"],
+        ["Theme 1", "Education & Work", "灌輸", "to instill (knowledge)"],
+        ["Theme 1", "Education & Work", "精通/掌握", "to master (a subject)"],
+        ["Theme 1", "Education & Work", "就業", "to obtain employment"],
+        ["Theme 1", "Education & Work", "經營生意/營商", "to operate a business"],
+        ["Theme 1", "Education & Work", "實踐", "to practise / put into practice"],
+        ["Theme 1", "Education & Work", "補習", "to receive private tuition"],
+        ["Theme 1", "Education & Work", "開公司", "to run a company"],
+        ["Theme 1", "Education & Work", "責罵", "to scold"],
+        ["Theme 1", "Education & Work", "創業", "to set up a business"],
+        ["Theme 1", "Education & Work", "主動", "to take initiative"],
+        ["Theme 1", "Education & Work", "輪班工作", "to work shifts"],
+        ["Theme 1", "Education & Work", "大學學位", "university degree"],
+        ["Theme 1", "Education & Work", "空缺", "vacancy"],
+        ["Theme 1", "Education & Work", "智慧", "wisdom"],
+        ["Theme 1", "Education & Work", "工作崗位/職位", "work position"],
+
+        // Theme 2 - Traditions
+        ["Theme 2", "Traditions", "祖先", "ancestors"],
+        ["Theme 2", "Traditions", "吉祥", "auspicious"],
+        ["Theme 2", "Traditions", "竹葉", "bamboo leaves"],
+        ["Theme 2", "Traditions", "佛教", "Buddhism"],
+        ["Theme 2", "Traditions", "嫦娥奔月", "Chang E goes to the moon"],
+        ["Theme 2", "Traditions", "農曆", "Chinese lunar calendar"],
+        ["Theme 2", "Traditions", "賀年食品", "Chinese New Year food"],
+        ["Theme 2", "Traditions", "正月初一", "Chinese New Year's Day"],
+        ["Theme 2", "Traditions", "除夕", "Chinese New Year's Eve"],
+        ["Theme 2", "Traditions", "年夜飯/團年飯", "Chinese New Year's Eve family dinner"],
+        ["Theme 2", "Traditions", "生肖/屬相", "Chinese zodiac animals"],
+        ["Theme 2", "Traditions", "文明", "civilisation"],
+        ["Theme 2", "Traditions", "商業化", "commercialised"],
+        ["Theme 2", "Traditions", "文化價值", "cultural value"],
+        ["Theme 2", "Traditions", "賽龍舟", "dragon boat races"],
+        ["Theme 2", "Traditions", "刺繡", "embroidery"],
+        ["Theme 2", "Traditions", "民間", "folk"],
+        ["Theme 2", "Traditions", "喪葬禮儀", "funeral rituals"],
+        ["Theme 2", "Traditions", "糯米", "glutinous rice"],
+        ["Theme 2", "Traditions", "湯圓", "glutinous rice balls"],
+        ["Theme 2", "Traditions", "神仙", "god / goddess / supernatural / being immortal"],
+        ["Theme 2", "Traditions", "財神", "God of Wealth"],
+        ["Theme 2", "Traditions", "掃墓", "grave sweeping"],
+        ["Theme 2", "Traditions", "習慣", "habit / be accustomed to"],
+        ["Theme 2", "Traditions", "手工藝品", "handicraft items"],
+        ["Theme 2", "Traditions", "火鍋", "hotpot"],
+        ["Theme 2", "Traditions", "燈籠", "lantern"],
+        ["Theme 2", "Traditions", "傳說", "legend"],
+        ["Theme 2", "Traditions", "生活方式", "lifestyle"],
+        ["Theme 2", "Traditions", "結婚禮俗", "marriage practices"],
+        ["Theme 2", "Traditions", "歷史悠久", "long history"],
+        ["Theme 2", "Traditions", "神話", "myth"],
+        ["Theme 2", "Traditions", "少數民族", "national minorities"],
+        ["Theme 2", "Traditions", "年糕", "New Year cake"],
+        ["Theme 2", "Traditions", "剪紙", "paper cuts"],
+        ["Theme 2", "Traditions", "屈原", "Qu Yuan"],
+        ["Theme 2", "Traditions", "壓歲錢/紅封包/利是錢", "red packet money / gift money"],
+        ["Theme 2", "Traditions", "儒家", "Confucianism"],
+        ["Theme 2", "Traditions", "祭品", "sacrificial offerings"],
+        ["Theme 2", "Traditions", "香包", "scented sachet (Dragon Boat Festival)"],
+        ["Theme 2", "Traditions", "節氣", "seasonal division points"],
+        ["Theme 2", "Traditions", "歸屬感", "sense of belonging"],
+        ["Theme 2", "Traditions", "認同感", "sense of identity"],
+        ["Theme 2", "Traditions", "春節聯歡晚會/春晚", "Spring Festival Gala"],
+        ["Theme 2", "Traditions", "迷信", "superstitious"],
+        ["Theme 2", "Traditions", "禁忌", "taboo"],
+        ["Theme 2", "Traditions", "道教", "Taoism"],
+        ["Theme 2", "Traditions", "寺廟", "temple"],
+        ["Theme 2", "Traditions", "賞月", "to admire the full moon"],
+        ["Theme 2", "Traditions", "打鼓", "to beat drums"],
+        ["Theme 2", "Traditions", "燒香", "to burn incense"],
+        ["Theme 2", "Traditions", "燒紙錢", "to burn paper money (ritual money)"],
+        ["Theme 2", "Traditions", "過年", "to celebrate the Chinese New Year"],
+        ["Theme 2", "Traditions", "大掃除", "to clean up the house (on Chinese New Year's Eve)"],
+        ["Theme 2", "Traditions", "恭喜", "to congratulate, congratulations"],
+        ["Theme 2", "Traditions", "慶祝/喜慶", "to celebrate / celebration"],
+        ["Theme 2", "Traditions", "裝飾/佈置/擺設", "to decorate"],
+        ["Theme 2", "Traditions", "辦年貨", "to do shopping for the Spring Festival"],
+        ["Theme 2", "Traditions", "欣賞", "to enjoy, appreciate"],
+        ["Theme 2", "Traditions", "團聚/團圓", "to get together as a family"],
+        ["Theme 2", "Traditions", "送禮", "to give a present"],
+        ["Theme 2", "Traditions", "踏青", "to go for a walk in the countryside"],
+        ["Theme 2", "Traditions", "源於/來源於", "to originate from"],
+        ["Theme 2", "Traditions", "去世/死了", "to pass away / die"],
+        ["Theme 2", "Traditions", "世代相傳", "to pass from generation to generation"],
+        ["Theme 2", "Traditions", "祈福", "to pray for blessing (good fortune)"],
+        ["Theme 2", "Traditions", "懷念/紀念", "to remember, commemorate"],
+        ["Theme 2", "Traditions", "趨吉避凶", "to seek good fortune and avoid mishaps"],
+        ["Theme 2", "Traditions", "放煙花", "to set off fireworks"],
+        ["Theme 2", "Traditions", "守歲", "to stay up all night on Chinese New Year's Eve"],
+        ["Theme 2", "Traditions", "思念", "to think about, long for"],
+        ["Theme 2", "Traditions", "逛花市", "to visit the flower fair"],
+        ["Theme 2", "Traditions", "穿旗袍", "to wear a traditional Chinese qipao"],
+        ["Theme 2", "Traditions", "拜年", "to wish someone a happy Chinese New Year"],
+        ["Theme 2", "Traditions", "寫春聯", "to write New Year's couplets"],
+
+        // Theme 2 - Cultural Activities
+        ["Theme 2", "Cultural Activities", "立體", "3D"],
+        ["Theme 2", "Cultural Activities", "搞笑", "amusing"],
+        ["Theme 2", "Cultural Activities", "芭蕾舞", "ballet"],
+        ["Theme 2", "Cultural Activities", "樂隊", "band"],
+        ["Theme 2", "Cultural Activities", "傳記", "biography"],
+        ["Theme 2", "Cultural Activities", "票房收入", "box office revenue"],
+        ["Theme 2", "Cultural Activities", "漫畫", "cartoon"],
+        ["Theme 2", "Cultural Activities", "動畫片/卡通片", "cartoon film"],
+        ["Theme 2", "Cultural Activities", "訪談節目/清談節目", "chat show"],
+        ["Theme 2", "Cultural Activities", "合唱團", "choir"],
+        ["Theme 2", "Cultural Activities", "古典音樂", "classical music"],
+        ["Theme 2", "Cultural Activities", "喜劇", "comedy"],
+        ["Theme 2", "Cultural Activities", "開幕", "curtain up / open / begin"],
+        ["Theme 2", "Cultural Activities", "偵探", "detective"],
+        ["Theme 2", "Cultural Activities", "導演", "director"],
+        ["Theme 2", "Cultural Activities", "災難片", "disaster film"],
+        ["Theme 2", "Cultural Activities", "紀錄片", "documentary"],
+        ["Theme 2", "Cultural Activities", "連續劇", "drama series"],
+        ["Theme 2", "Cultural Activities", "娛樂圈", "entertainment industry"],
+        ["Theme 2", "Cultural Activities", "二胡", "erhu"],
+        ["Theme 2", "Cultural Activities", "精彩", "excellent"],
+        ["Theme 2", "Cultural Activities", "影迷", "fan"],
+        ["Theme 2", "Cultural Activities", "電影明星", "film star"],
+        ["Theme 2", "Cultural Activities", "民歌", "folk song"],
+        ["Theme 2", "Cultural Activities", "美食節目", "food programme"],
+        ["Theme 2", "Cultural Activities", "電影", "film"],
+        ["Theme 2", "Cultural Activities", "古箏", "guzheng (Chinese zither)"],
+        ["Theme 2", "Cultural Activities", "恐怖片", "horror film"],
+        ["Theme 2", "Cultural Activities", "熱門話題", "hot topic"],
+        ["Theme 2", "Cultural Activities", "資訊/信息", "information"],
+        ["Theme 2", "Cultural Activities", "大型", "large scale"],
+        ["Theme 2", "Cultural Activities", "主角", "main role / character"],
+        ["Theme 2", "Cultural Activities", "武俠片", "martial arts film"],
+        ["Theme 2", "Cultural Activities", "感動", "moving / to feel moved"],
+        ["Theme 2", "Cultural Activities", "樂器", "musical instrument"],
+        ["Theme 2", "Cultural Activities", "小說", "novel"],
+        ["Theme 2", "Cultural Activities", "戲曲", "opera (Chinese)"],
+        ["Theme 2", "Cultural Activities", "歌劇", "opera (Western)"],
+        ["Theme 2", "Cultural Activities", "攝影", "photography"],
+        ["Theme 2", "Cultural Activities", "鋼琴", "piano"],
+        ["Theme 2", "Cultural Activities", "琵琶", "pipa"],
+        ["Theme 2", "Cultural Activities", "劇情/情節", "plot"],
+        ["Theme 2", "Cultural Activities", "詩/詩歌", "poetry"],
+        ["Theme 2", "Cultural Activities", "演唱會", "pop concert"],
+        ["Theme 2", "Cultural Activities", "流行", "popular"],
+        ["Theme 2", "Cultural Activities", "散文", "prose"],
+        ["Theme 2", "Cultural Activities", "讀者", "reader"],
+        ["Theme 2", "Cultural Activities", "真人秀", "reality show"],
+        ["Theme 2", "Cultural Activities", "搖滾樂", "rock 'n' roll"],
+        ["Theme 2", "Cultural Activities", "角色", "role / character"],
+        ["Theme 2", "Cultural Activities", "浪漫/愛情", "romance"],
+        ["Theme 2", "Cultural Activities", "諷刺", "satire"],
+        ["Theme 2", "Cultural Activities", "場景/場面", "scene"],
+        ["Theme 2", "Cultural Activities", "科幻", "science fiction/fantasy"],
+        ["Theme 2", "Cultural Activities", "配樂", "score (of a film)"],
+        ["Theme 2", "Cultural Activities", "編劇", "scriptwriter"],
+        ["Theme 2", "Cultural Activities", "煽情", "sensational"],
+        ["Theme 2", "Cultural Activities", "幽默感", "sense of humour"],
+        ["Theme 2", "Cultural Activities", "演出/表演/秀", "show"],
+        ["Theme 2", "Cultural Activities", "舞臺", "stage"],
+        ["Theme 2", "Cultural Activities", "故事", "story"],
+        ["Theme 2", "Cultural Activities", "古怪離奇", "strange / weird"],
+        ["Theme 2", "Cultural Activities", "題材/内容", "subject matter"],
+        ["Theme 2", "Cultural Activities", "配角", "supporting actor"],
+        ["Theme 2", "Cultural Activities", "廣播", "to broadcast"],
+        ["Theme 2", "Cultural Activities", "拍攝", "to film / photograph, photography"],
+        ["Theme 2", "Cultural Activities", "載歌載舞", "to sing and dance"],
+        ["Theme 2", "Cultural Activities", "悲劇", "tragedy"],
+        ["Theme 2", "Cultural Activities", "潮流/趨勢", "trend"],
+        ["Theme 2", "Cultural Activities", "電視主持人", "TV presenter"],
+        ["Theme 2", "Cultural Activities", "綜藝節目", "variety show"],
+        ["Theme 2", "Cultural Activities", "視頻", "video"],
+        ["Theme 2", "Cultural Activities", "小提琴", "violin"],
+        ["Theme 2", "Cultural Activities", "戰爭片", "war film"],
+        ["Theme 2", "Cultural Activities", "週刊", "weekly magazine"],
+        ["Theme 2", "Cultural Activities", "作家/作者", "writer"],
+
+        // Theme 3 - Comms & Tech
+        ["Theme 3", "Comms & Tech", "帳戶/帳號", "account"],
+        ["Theme 3", "Comms & Tech", "應用程式", "application (app)"],
+        ["Theme 3", "Comms & Tech", "視聽娛樂", "audio-visual entertainment"],
+        ["Theme 3", "Comms & Tech", "寬帶/寬頻", "broadband"],
+        ["Theme 3", "Comms & Tech", "按鈕", "button (on a computer screen)"],
+        ["Theme 3", "Comms & Tech", "有線/無線", "cable / wireless"],
+        ["Theme 3", "Comms & Tech", "社群", "community"],
+        ["Theme 3", "Comms & Tech", "侵犯版權", "copyright infringement"],
+        ["Theme 3", "Comms & Tech", "虛擬空間", "cyberspace"],
+        ["Theme 3", "Comms & Tech", "數據", "data"],
+        ["Theme 3", "Comms & Tech", "數碼鴻溝", "digital divide"],
+        ["Theme 3", "Comms & Tech", "電子書", "electronic book (e-book)"],
+        ["Theme 3", "Comms & Tech", "表情符號", "emoticon/emoji"],
+        ["Theme 3", "Comms & Tech", "檔案", "file"],
+        ["Theme 3", "Comms & Tech", "防火牆", "firewall"],
+        ["Theme 3", "Comms & Tech", "論壇", "forum"],
+        ["Theme 3", "Comms & Tech", "谷歌", "Google"],
+        ["Theme 3", "Comms & Tech", "黑客/駭客", "hacker"],
+        ["Theme 3", "Comms & Tech", "點擊率", "hit rate"],
+        ["Theme 3", "Comms & Tech", "圖像", "image"],
+        ["Theme 3", "Comms & Tech", "資訊流通/信息流動", "information flow"],
+        ["Theme 3", "Comms & Tech", "上網成癮/沉迷上網", "internet addiction"],
+        ["Theme 3", "Comms & Tech", "互聯網時代", "internet age"],
+        ["Theme 3", "Comms & Tech", "人際網絡", "interpersonal network"],
+        ["Theme 3", "Comms & Tech", "鍵盤", "keyboard"],
+        ["Theme 3", "Comms & Tech", "「讚好」功能", "\"like\" function (Facebook)"],
+        ["Theme 3", "Comms & Tech", "登入", "log on/sign in"],
+        ["Theme 3", "Comms & Tech", "大眾傳媒", "mass media"],
+        ["Theme 3", "Comms & Tech", "微軟", "Microsoft"],
+        ["Theme 3", "Comms & Tech", "流動媒體", "mobile media"],
+        ["Theme 3", "Comms & Tech", "滑鼠", "mouse"],
+        ["Theme 3", "Comms & Tech", "多媒體產品", "multimedia products"],
+        ["Theme 3", "Comms & Tech", "網民", "netizen"],
+        ["Theme 3", "Comms & Tech", "網上購物", "online shopping"],
+        ["Theme 3", "Comms & Tech", "個人資料", "personal data"],
+        ["Theme 3", "Comms & Tech", "私隱/隱私", "privacy"],
+        ["Theme 3", "Comms & Tech", "屏幕", "screen"],
+        ["Theme 3", "Comms & Tech", "自我控制", "self-control"],
+        ["Theme 3", "Comms & Tech", "技術/技巧/技能", "skill"],
+        ["Theme 3", "Comms & Tech", "智能手機", "smart phone"],
+        ["Theme 3", "Comms & Tech", "社交平台", "social platform"],
+        ["Theme 3", "Comms & Tech", "軟件/軟體", "software"],
+        ["Theme 3", "Comms & Tech", "狀態更新", "status updates"],
+        ["Theme 3", "Comms & Tech", "平板電腦", "tablet"],
+        ["Theme 3", "Comms & Tech", "離線/脫機", "to be offline"],
+        ["Theme 3", "Comms & Tech", "上網/上線", "to be online"],
+        ["Theme 3", "Comms & Tech", "瀏覽", "to browse"],
+        ["Theme 3", "Comms & Tech", "複製", "to copy"],
+        ["Theme 3", "Comms & Tech", "創作", "to create"],
+        ["Theme 3", "Comms & Tech", "剪貼", "to cut and paste"],
+        ["Theme 3", "Comms & Tech", "刪除", "to delete (a message)"],
+        ["Theme 3", "Comms & Tech", "數碼化/數字化", "to digitise"],
+        ["Theme 3", "Comms & Tech", "表達意見", "to express views"],
+        ["Theme 3", "Comms & Tech", "瘋傳", "to go viral"],
+        ["Theme 3", "Comms & Tech", "入侵", "to hack into"],
+        ["Theme 3", "Comms & Tech", "輸入", "to input"],
+        ["Theme 3", "Comms & Tech", "互動/交流", "to interact"],
+        ["Theme 3", "Comms & Tech", "發明", "to invent"],
+        ["Theme 3", "Comms & Tech", "監控/監察", "to monitor"],
+        ["Theme 3", "Comms & Tech", "導航", "to navigate"],
+        ["Theme 3", "Comms & Tech", "操作", "to operate (a computer)"],
+        ["Theme 3", "Comms & Tech", "刷新", "to refresh (computer screen)"],
+        ["Theme 3", "Comms & Tech", "留言", "to leave a message"],
+        ["Theme 3", "Comms & Tech", "掃描", "to scan"],
+        ["Theme 3", "Comms & Tech", "搜尋", "to search"],
+        ["Theme 3", "Comms & Tech", "分享", "to share"],
+        ["Theme 3", "Comms & Tech", "自拍", "to take a selfie"],
+        ["Theme 3", "Comms & Tech", "更新帖子", "to update a post"],
+        ["Theme 3", "Comms & Tech", "推特", "Twitter"],
+        ["Theme 3", "Comms & Tech", "用户/使用者", "user"],
+        ["Theme 3", "Comms & Tech", "用戶組/使用者群組", "user group"],
+        ["Theme 3", "Comms & Tech", "錄影短片/錄像短片", "video clips"],
+        ["Theme 3", "Comms & Tech", "虛擬現實/虛擬世界", "virtual reality"],
+        ["Theme 3", "Comms & Tech", "微博", "Weibo"],
+        ["Theme 3", "Comms & Tech", "微信", "Weixin"],
+
+        // Theme 3 - Economy & Env
+        ["Theme 3", "Economy & Env", "調整", "adjustment"],
+        ["Theme 3", "Economy & Env", "空氣", "air"],
+        ["Theme 3", "Economy & Env", "環境保護意識", "awareness of environmental protection"],
+        ["Theme 3", "Economy & Env", "細菌", "bacteria"],
+        ["Theme 3", "Economy & Env", "泡沫經濟", "bubble economy"],
+        ["Theme 3", "Economy & Env", "資本", "capital"],
+        ["Theme 3", "Economy & Env", "資本家", "capitalist"],
+        ["Theme 3", "Economy & Env", "燃煤", "coal"],
+        ["Theme 3", "Economy & Env", "保護/保育", "conservation"],
+        ["Theme 3", "Economy & Env", "工程項目/建設項目", "construction project"],
+        ["Theme 3", "Economy & Env", "消費", "consumption"],
+        ["Theme 3", "Economy & Env", "消費者", "consumer"],
+        ["Theme 3", "Economy & Env", "成本", "cost"],
+        ["Theme 3", "Economy & Env", "赤字", "deficit"],
+        ["Theme 3", "Economy & Env", "需求", "demand (in economics)"],
+        ["Theme 3", "Economy & Env", "荒漠化", "desertification"],
+        ["Theme 3", "Economy & Env", "旱災/乾旱", "drought"],
+        ["Theme 3", "Economy & Env", "生態", "ecological"],
+        ["Theme 3", "Economy & Env", "減排目標", "emission reduction targets"],
+        ["Theme 3", "Economy & Env", "企業家", "entrepreneur"],
+        ["Theme 3", "Economy & Env", "出口", "export"],
+        ["Theme 3", "Economy & Env", "金融危機", "financial crisis"],
+        ["Theme 3", "Economy & Env", "水災/洪水氾濫", "flooding"],
+        ["Theme 3", "Economy & Env", "全球化", "globalisation"],
+        ["Theme 3", "Economy & Env", "綠化運動", "greening campaign"],
+        ["Theme 3", "Economy & Env", "國內生產總值", "gross domestic product (GDP)"],
+        ["Theme 3", "Economy & Env", "增長", "growth (in economics)"],
+        ["Theme 3", "Economy & Env", "衛生/清潔/乾淨", "hygienic / clean"],
+        ["Theme 3", "Economy & Env", "失衡", "imbalance"],
+        ["Theme 3", "Economy & Env", "進口", "import"],
+        ["Theme 3", "Economy & Env", "收入/收益", "income"],
+        ["Theme 3", "Economy & Env", "傳染病", "infectious disease"],
+        ["Theme 3", "Economy & Env", "通貨膨脹/通脹", "inflation"],
+        ["Theme 3", "Economy & Env", "基礎建設", "infrastructure"],
+        ["Theme 3", "Economy & Env", "投資", "investment"],
+        ["Theme 3", "Economy & Env", "勞動力", "labour force"],
+        ["Theme 3", "Economy & Env", "長遠利益", "long-term benefits / interests"],
+        ["Theme 3", "Economy & Env", "奢侈品", "luxury goods"],
+        ["Theme 3", "Economy & Env", "製造業", "manufacturing industry"],
+        ["Theme 3", "Economy & Env", "核電站", "nuclear power station"],
+        ["Theme 3", "Economy & Env", "阻礙/障礙", "obstacle"],
+        ["Theme 3", "Economy & Env", "政策", "policy"],
+        ["Theme 3", "Economy & Env", "污染物", "pollutant"],
+        ["Theme 3", "Economy & Env", "污水", "polluted water"],
+        ["Theme 3", "Economy & Env", "物價", "price of goods"],
+        ["Theme 3", "Economy & Env", "利潤", "profits"],
+        ["Theme 3", "Economy & Env", "協議/協定", "protocol/agreement"],
+        ["Theme 3", "Economy & Env", "品質/質素", "quality"],
+        ["Theme 3", "Economy & Env", "數量", "quantity"],
+        ["Theme 3", "Economy & Env", "房地產", "real estate / property"],
+        ["Theme 3", "Economy & Env", "法規/規例", "regulations"],
+        ["Theme 3", "Economy & Env", "人民幣", "Renminbi"],
+        ["Theme 3", "Economy & Env", "再生能源", "renewable energy"],
+        ["Theme 3", "Economy & Env", "豐富", "rich (in the sense of varied and excellent)"],
+        ["Theme 3", "Economy & Env", "銷售", "sales"],
+        ["Theme 3", "Economy & Env", "股票", "shares"],
+        ["Theme 3", "Economy & Env", "缺少/缺乏/短缺", "shortage"],
+        ["Theme 3", "Economy & Env", "放緩", "slowdown (in economics)"],
+        ["Theme 3", "Economy & Env", "霧霾", "smog"],
+        ["Theme 3", "Economy & Env", "陽光", "sunlight"],
+        ["Theme 3", "Economy & Env", "供應", "supply (in economics)"],
+        ["Theme 3", "Economy & Env", "盈餘", "surplus"],
+        ["Theme 3", "Economy & Env", "可持續發展", "sustainable development"],
+        ["Theme 3", "Economy & Env", "税收", "taxation"],
+        ["Theme 3", "Economy & Env", "呼吸", "to breathe"],
+        ["Theme 3", "Economy & Env", "惡化", "to deteriorate"],
+        ["Theme 3", "Economy & Env", "推動", "to drive (growth)"],
+        ["Theme 3", "Economy & Env", "發電", "to generate electricity"],
+        ["Theme 3", "Economy & Env", "預防", "to prevent"],
+        ["Theme 3", "Economy & Env", "出產/生產", "to produce"],
+        ["Theme 3", "Economy & Env", "珍惜", "to treasure"],
+        ["Theme 3", "Economy & Env", "貿易逆差", "trade deficit"],
+        ["Theme 3", "Economy & Env", "貿易順差", "trade surplus"],
+        ["Theme 3", "Economy & Env", "失業率", "unemployment rate"],
+        ["Theme 3", "Economy & Env", "水資源", "water resources"],
+
+        // Theme 4 - Reform
+        ["Theme 4", "Reform", "農業戶口", "agricultural household"],
+        ["Theme 4", "Reform", "可耕地", "arable land"],
+        ["Theme 4", "Reform", "基本生活需要", "basic needs in life"],
+        ["Theme 4", "Reform", "資本主義", "capitalism"],
+        ["Theme 4", "Reform", "留守兒童", "children left behind in rural areas"],
+        ["Theme 4", "Reform", "百姓/老百姓", "Chinese people (the 'old hundred surnames')"],
+        ["Theme 4", "Reform", "沿海地區", "coastal areas"],
+        ["Theme 4", "Reform", "競爭力", "competitiveness"],
+        ["Theme 4", "Reform", "鄧小平", "Deng Xiaoping"],
+        ["Theme 4", "Reform", "人口密集", "densely populated"],
+        ["Theme 4", "Reform", "歧視", "discrimination"],
+        ["Theme 4", "Reform", "溫飽", "enough to eat and wear"],
+        ["Theme 4", "Reform", "擴張/擴大", "expansion"],
+        ["Theme 4", "Reform", "小康社會", "fairly well-off society"],
+        ["Theme 4", "Reform", "公平", "fairness"],
+        ["Theme 4", "Reform", "農民", "farmers / peasants"],
+        ["Theme 4", "Reform", "流動人口", "floating population"],
+        ["Theme 4", "Reform", "城鄉差異", "gap between urban and rural areas"],
+        ["Theme 4", "Reform", "政府", "government"],
+        ["Theme 4", "Reform", "補助", "grants"],
+        ["Theme 4", "Reform", "高科技企業", "high-technology / high-tech enterprises"],
+        ["Theme 4", "Reform", "居民户口簿", "household register"],
+        ["Theme 4", "Reform", "户籍制度", "household registration system"],
+        ["Theme 4", "Reform", "住房/住屋/房屋", "housing"],
+        ["Theme 4", "Reform", "欠債/負債", "in debt"],
+        ["Theme 4", "Reform", "收入不平等", "income inequality"],
+        ["Theme 4", "Reform", "勞資糾紛", "labour disputes"],
+        ["Theme 4", "Reform", "勞動密集型工業", "labour-intensive industries"],
+        ["Theme 4", "Reform", "田地/土地", "land"],
+        ["Theme 4", "Reform", "民生", "livelihood"],
+        ["Theme 4", "Reform", "貸款", "loan"],
+        ["Theme 4", "Reform", "低技術工人", "low-skilled worker"],
+        ["Theme 4", "Reform", "措施", "measures"],
+        ["Theme 4", "Reform", "中下階層", "middle and lower classes (in society)"],
+        ["Theme 4", "Reform", "農民工/民工", "migrant workers"],
+        ["Theme 4", "Reform", "遷移", "migration"],
+        ["Theme 4", "Reform", "最低工資", "minimum wage"],
+        ["Theme 4", "Reform", "非農業戶口", "non-agricultural household"],
+        ["Theme 4", "Reform", "優惠政策", "preferential policy"],
+        ["Theme 4", "Reform", "私營企業", "private enterprises"],
+        ["Theme 4", "Reform", "生產力", "productivity"],
+        ["Theme 4", "Reform", "繁榮", "prosperity"],
+        ["Theme 4", "Reform", "省", "province"],
+        ["Theme 4", "Reform", "公共設施", "public facilities"],
+        ["Theme 4", "Reform", "國企改革", "reform of state-owned enterprises"],
+        ["Theme 4", "Reform", "權利/權益", "rights"],
+        ["Theme 4", "Reform", "鄉村/農村", "rural areas / villages"],
+        ["Theme 4", "Reform", "二等公民", "second-class citizens"],
+        ["Theme 4", "Reform", "服務業", "service industry / sector"],
+        ["Theme 4", "Reform", "中外合資", "sino-foreign joint venture"],
+        ["Theme 4", "Reform", "社會矛盾", "social conflicts"],
+        ["Theme 4", "Reform", "社會穩定", "social stability"],
+        ["Theme 4", "Reform", "社會主義市場經濟", "socialist market economy"],
+        ["Theme 4", "Reform", "經濟特區", "special economic zone"],
+        ["Theme 4", "Reform", "生活水平", "standard of living"],
+        ["Theme 4", "Reform", "地位", "status"],
+        ["Theme 4", "Reform", "血汗工廠", "sweatshop"],
+        ["Theme 4", "Reform", "紓緩", "to alleviate / ease (pressure)"],
+        ["Theme 4", "Reform", "享有", "to enjoy (rights)"],
+        ["Theme 4", "Reform", "忽視/忽略", "to ignore / neglect"],
+        ["Theme 4", "Reform", "實施/落實", "to implement (policies)"],
+        ["Theme 4", "Reform", "落後", "to lag behind"],
+        ["Theme 4", "Reform", "推出", "to launch (a policy)"],
+        ["Theme 4", "Reform", "離鄉別井", "to leave one's homeland/hometown"],
+        ["Theme 4", "Reform", "脫貧", "to lift oneself out of poverty"],
+        ["Theme 4", "Reform", "謀生", "to make a living"],
+        ["Theme 4", "Reform", "縮小/減低", "to reduce"],
+        ["Theme 4", "Reform", "放寬", "to relax (restrictions)"],
+        ["Theme 4", "Reform", "限制", "to restrict / limit"],
+        ["Theme 4", "Reform", "扶持/支持/支援", "to support"],
+        ["Theme 4", "Reform", "交通堵塞", "traffic congestion"],
+        ["Theme 4", "Reform", "向上流動", "upward mobility (in society)"],
+        ["Theme 4", "Reform", "城鎮化/城市化", "urbanisation"],
+        ["Theme 4", "Reform", "富裕/富有", "wealthy"],
+        ["Theme 4", "Reform", "世界貿易組織", "World Trade Organisation (WTO)"],
+
+        // Theme 4 - China-UK Relations
+        ["Theme 4", "China-UK Relations", "建議/意見", "advice"],
+        ["Theme 4", "China-UK Relations", "藝術", "arts"],
+        ["Theme 4", "China-UK Relations", "文物", "artifacts"],
+        ["Theme 4", "China-UK Relations", "亞洲基礎設施投資銀行/亞投行", "Asian Infrastructure Investment Bank (AIIB)"],
+        ["Theme 4", "China-UK Relations", "吸引力", "attractiveness"],
+        ["Theme 4", "China-UK Relations", "一帶一路", "Belt and Road initiative"],
+        ["Theme 4", "China-UK Relations", "寄宿學校", "boarding schools"],
+        ["Theme 4", "China-UK Relations", "品牌", "brand / brand name"],
+        ["Theme 4", "China-UK Relations", "英國文化協會", "British Council"],
+        ["Theme 4", "China-UK Relations", "雙邊貿易", "bilateral trade"],
+        ["Theme 4", "China-UK Relations", "商業集團", "commercial group"],
+        ["Theme 4", "China-UK Relations", "孔子學院", "Confucius Institute"],
+        ["Theme 4", "China-UK Relations", "財團", "consortium"],
+        ["Theme 4", "China-UK Relations", "積極/建設性", "constructive"],
+        ["Theme 4", "China-UK Relations", "接觸/連繫/人脈", "contact(s)"],
+        ["Theme 4", "China-UK Relations", "貢獻", "contribution"],
+        ["Theme 4", "China-UK Relations", "合作", "co-operation"],
+        ["Theme 4", "China-UK Relations", "創意人才", "creative talents"],
+        ["Theme 4", "China-UK Relations", "文化遺產", "cultural heritage"],
+        ["Theme 4", "China-UK Relations", "尖端產品", "cutting-edge products"],
+        ["Theme 4", "China-UK Relations", "代表團", "delegation"],
+        ["Theme 4", "China-UK Relations", "發達國家", "developed nations"],
+        ["Theme 4", "China-UK Relations", "發展中國家", "developing nations"],
+        ["Theme 4", "China-UK Relations", "對話", "dialogue"],
+        ["Theme 4", "China-UK Relations", "多元文化", "diverse cultures / multicultural"],
+        ["Theme 4", "China-UK Relations", "入境簽證", "entry visa"],
+        ["Theme 4", "China-UK Relations", "思想交流", "exchange of ideas"],
+        ["Theme 4", "China-UK Relations", "交流生/交換生", "exchange students"],
+        ["Theme 4", "China-UK Relations", "互訪計劃", "exchange visit programme"],
+        ["Theme 4", "China-UK Relations", "專門知識/專業知識", "expertise"],
+        ["Theme 4", "China-UK Relations", "電影節", "film festival"],
+        ["Theme 4", "China-UK Relations", "金融中心", "financial centre"],
+        ["Theme 4", "China-UK Relations", "频繁", "frequent"],
+        ["Theme 4", "China-UK Relations", "資金/經費", "fund"],
+        ["Theme 4", "China-UK Relations", "環球視野/國際視野", "global vision / horizons"],
+        ["Theme 4", "China-UK Relations", "政府部門", "government departments"],
+        ["Theme 4", "China-UK Relations", "和睦/和諧", "harmony"],
+        ["Theme 4", "China-UK Relations", "高等教育", "higher education"],
+        ["Theme 4", "China-UK Relations", "靈感/啟發", "inspiration"],
+        ["Theme 4", "China-UK Relations", "實習", "internship"],
+        ["Theme 4", "China-UK Relations", "倫敦證券交易所", "London Stock Exchange"],
+        ["Theme 4", "China-UK Relations", "會議/大會", "meetings"],
+        ["Theme 4", "China-UK Relations", "互相了解/相互理解", "mutual understanding"],
+        ["Theme 4", "China-UK Relations", "磋商", "negotiation"],
+        ["Theme 4", "China-UK Relations", "官員", "officials"],
+        ["Theme 4", "China-UK Relations", "海外生/留學生", "overseas students"],
+        ["Theme 4", "China-UK Relations", "夥伴關係", "partnership"],
+        ["Theme 4", "China-UK Relations", "和平", "peace"],
+        ["Theme 4", "China-UK Relations", "表演藝術", "performing arts"],
+        ["Theme 4", "China-UK Relations", "零售業", "retail industry"],
+        ["Theme 4", "China-UK Relations", "風險", "risk / hazard"],
+        ["Theme 4", "China-UK Relations", "友好城市關係", "sister city relationships"],
+        ["Theme 4", "China-UK Relations", "軟實力", "soft power"],
+        ["Theme 4", "China-UK Relations", "國家領導人", "state leaders"],
+        ["Theme 4", "China-UK Relations", "策略", "strategy"],
+        ["Theme 4", "China-UK Relations", "優勢", "strengths / advantages"],
+        ["Theme 4", "China-UK Relations", "學習團/考察團", "study tour"],
+        ["Theme 4", "China-UK Relations", "高峰會/峰會", "summit"],
+        ["Theme 4", "China-UK Relations", "交響樂團", "symphony orchestra"],
+        ["Theme 4", "China-UK Relations", "會談/講座", "talks"],
+        ["Theme 4", "China-UK Relations", "品味/欣賞力/鑑賞力", "taste (in aesthetics)"],
+        ["Theme 4", "China-UK Relations", "教學方法", "teaching methods"],
+        ["Theme 4", "China-UK Relations", "拓寬/擴闊", "to broaden (horizons)"],
+        ["Theme 4", "China-UK Relations", "協調/統籌", "to co-ordinate"],
+        ["Theme 4", "China-UK Relations", "促進/提升/推動", "to promote / further the progress of"],
+        ["Theme 4", "China-UK Relations", "贊助/資助", "to sponsor (an event)"],
+        ["Theme 4", "China-UK Relations", "加強/鞏固", "to strengthen"],
+        ["Theme 4", "China-UK Relations", "共同關心的議題/共同關注的問題", "topics of common interest"],
+        ["Theme 4", "China-UK Relations", "總值", "total value"],
+        ["Theme 4", "China-UK Relations", "巡迴演出/巡演", "tour (theatrical)"],
+        ["Theme 4", "China-UK Relations", "交易", "transaction"],
+        ["Theme 4", "China-UK Relations", "雙向交流", "two-way communication / interaction"],
+        ["Theme 4", "China-UK Relations", "聯合國", "United Nations"],
+        ["Theme 4", "China-UK Relations", "職業教育", "vocational education"],
+        ["Theme 4", "China-UK Relations", "世界一流", "world-class"]
+    ];
+
+    rawData.forEach((item, index) => {
+        masterData.push({
+            id: index + 1,
+            category: item[0] || "",
+            subcategory: item[1] || "",
+            term: item[2] || "",
+            trans: item[3] || "",
+            termsList: parseSynonyms(item[2]),
+            transList: parseSynonyms(item[3])
+        });
+    });
+
+    document.addEventListener('DOMContentLoaded', () => {
+        updateSubcategoryOptions();
+        filterWordList();
+        toggleSourceConfig();
+        toggleDictationRangeConfig();
+        toggleDictationModeConfig();
+
+        const practiceTypeEl = document.getElementById('practice-type');
+        const practiceSourceEl = document.getElementById('practice-source');
+        const dictationRangeEl = document.getElementById('dictation-range');
+        const dictationModeTypeEl = document.getElementById('dictation-mode-type');
+
+        if(practiceTypeEl) practiceTypeEl.addEventListener('change', toggleSourceConfig);
+        if(practiceSourceEl) practiceSourceEl.addEventListener('change', toggleSourceConfig);
+        if(dictationRangeEl) dictationRangeEl.addEventListener('change', toggleDictationRangeConfig);
+        if(dictationModeTypeEl) dictationModeTypeEl.addEventListener('change', toggleDictationModeConfig);
+    });
+
+    function onCategoryFilterChange() {
+        updateSubcategoryOptions();
+        filterWordList();
+    }
+
+    function updateSubcategoryOptions() {
+        const catSelect = document.getElementById('category-filter');
+        const subSelect = document.getElementById('subcategory-filter');
+        if(!catSelect || !subSelect) return;
+
+        const cat = catSelect.value;
+        subSelect.innerHTML = '<option value="all">全部子主題</option>';
+
+        let subs = [];
+        if (cat === 'all') {
+            subs = [...new Set(masterData.map(d => d.subcategory))];
+        } else {
+            subs = [...new Set(masterData.filter(d => d.category === cat).map(d => d.subcategory))];
+        }
+
+        subs.forEach(s => {
+            if(!s) return;
+            const opt = document.createElement('option');
+            opt.value = s;
+            opt.innerText = s;
+            subSelect.appendChild(opt);
+        });
+    }
+
+    function toggleColumn(colName) {
+        hiddenColumns[colName] = !hiddenColumns[colName];
+        filterWordList();
+    }
+
+    function switchTab(evt, sectionId) {
+        document.querySelectorAll('.section').forEach(sec => sec.classList.remove('active'));
+        document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+        const targetSec = document.getElementById(sectionId);
+        if(targetSec) targetSec.classList.add('active');
+        if(evt && evt.currentTarget) evt.currentTarget.classList.add('active');
+
+        if(sectionId === 'wrong-book-section') {
+            renderWrongBook();
+        }
+    }
+
+    function filterWordList() {
+        const catSelect = document.getElementById('category-filter');
+        const subSelect = document.getElementById('subcategory-filter');
+        const searchInput = document.getElementById('search-input');
+
+        const catVal = catSelect ? catSelect.value : 'all';
+        const subVal = subSelect ? subSelect.value : 'all';
+        const keyword = searchInput ? searchInput.value.toLowerCase() : '';
+
+        const catTh = document.querySelector('.th-cat');
+        const subTh = document.querySelector('.th-sub');
+
+        if (catTh) {
+            catTh.innerHTML = hiddenColumns.cat ? 
+                `主題 <button class="toggle-btn" onclick="toggleColumn('cat')" title="展開主題">👁️</button>` : 
+                `主題 <button class="toggle-btn" onclick="toggleColumn('cat')" title="隱藏主題">👁️</button>`;
+        }
+
+        if (subTh) {
+            subTh.innerHTML = hiddenColumns.sub ? 
+                `子主題 <button class="toggle-btn" onclick="toggleColumn('sub')" title="展開子主題">👁️</button>` : 
+                `子主題 <button class="toggle-btn" onclick="toggleColumn('sub')" title="隱藏子主題">👁️</button>`;
+        }
+
+        const filtered = masterData.filter(item => {
+            const matchesCat = (catVal === 'all') || (item.category === catVal);
+            const matchesSub = (subVal === 'all') || (item.subcategory === subVal);
+            const matchesKeyword = String(item.term).toLowerCase().includes(keyword) || String(item.trans).toLowerCase().includes(keyword);
+
+            return matchesCat && matchesSub && matchesKeyword;
+        });
+
+        renderTable(filtered);
+    }
+
+    function renderTable(data) {
+        const tbody = document.getElementById('word-table-body');
+        if(!tbody) return;
+        tbody.innerHTML = '';
+        if(data.length === 0) {
+            let colSpan = 6 - (hiddenColumns.cat ? 1 : 0) - (hiddenColumns.sub ? 1 : 0);
+            tbody.innerHTML = `<tr><td colspan="${colSpan}" style="text-align:center; color:#64748b;">沒有找到符合的詞彙</td></tr>`;
+            return;
+        }
+        data.forEach(item => {
+            const uniqueKey = item.id;
+            const isChecked = selectedIds.has(uniqueKey) ? 'checked' : '';
+            const tr = document.createElement('tr');
+            
+            let mainBadgeClass = "badge-theme-main";
+            let subBadgeClass = "badge-theme-sub";
+            
+            let catTd = hiddenColumns.cat ? '' : `<td><span class="badge ${mainBadgeClass}">${item.category}</span></td>`;
+            let subTd = hiddenColumns.sub ? '' : `<td><span class="badge ${subBadgeClass}">${item.subcategory}</span></td>`;
+
+            tr.innerHTML = `
+                <td class="checkbox-cell"><input type="checkbox" value="${uniqueKey}" ${isChecked} onchange="toggleItemSelection(${uniqueKey}, this.checked)"></td>
+                <td>${item.id}</td>
+                <td><strong>${item.term}</strong></td>
+                <td>${item.trans}</td>
+                ${catTd}
+                ${subTd}
+            `;
+            tbody.appendChild(tr);
+        });
+    }
+
+    function toggleItemSelection(id, checked) {
+        if(checked) {
+            selectedIds.add(id);
+        } else {
+            selectedIds.delete(id);
+        }
+        updateSelectedCount();
+    }
+
+    function toggleSelectAll(selectAllCb) {
+        const checkboxes = document.querySelectorAll('#word-table-body input[type="checkbox"]');
+        checkboxes.forEach(cb => {
+            cb.checked = selectAllCb.checked;
+            const id = parseInt(cb.value);
+            if(selectAllCb.checked) selectedIds.add(id);
+            else selectedIds.delete(id);
+        });
+        updateSelectedCount();
+    }
+
+    function selectAllFiltered(select) {
+        const checkboxes = document.querySelectorAll('#word-table-body input[type="checkbox"]');
+        checkboxes.forEach(cb => {
+            cb.checked = select;
+            const id = parseInt(cb.value);
+            if(select) selectedIds.add(id);
+            else selectedIds.delete(id);
+        });
+        updateSelectedCount();
+    }
+
+    function updateSelectedCount() {
+        const scElem = document.getElementById('selected-count');
+        const dcElem = document.getElementById('dict-custom-count');
+        const pcElem = document.getElementById('practice-custom-count');
+        if(scElem) scElem.innerText = selectedIds.size;
+        if(dcElem) dcElem.innerText = selectedIds.size;
+        if(pcElem) pcElem.innerText = selectedIds.size;
+    }
+
+    function toggleSourceConfig() {
+        const sourceEl = document.getElementById('practice-source');
+        const container = document.getElementById('source-detail-container');
+        const practiceTypeEl = document.getElementById('practice-type');
+        if(!sourceEl || !container || !practiceTypeEl) return;
+
+        const source = sourceEl.value;
+        const practiceType = practiceTypeEl.value;
+        
+        let html = '';
+        if(source === 'all') {
+            html = ``;
+        } else if(source === 'category') {
+            html = `
+                <div>
+                    <span style="font-size:13px; font-weight:600; color:#334155;">選擇主題 (可多選):</span>
+                    <div class="checkbox-group">
+                        <label><input type="checkbox" name="practice-cat" value="Theme 1" checked> Theme 1</label>
+                        <label><input type="checkbox" name="practice-cat" value="Theme 2" checked> Theme 2</label>
+                        <label><input type="checkbox" name="practice-cat" value="Theme 3" checked> Theme 3</label>
+                        <label><input type="checkbox" name="practice-cat" value="Theme 4" checked> Theme 4</label>
+                    </div>
+                </div>`;
+        } else if(source === 'subcategory') {
+            let cats = [...new Set(masterData.map(d => d.category))];
+            let subHtml = '';
+            cats.forEach(cat => {
+                let subs = [...new Set(masterData.filter(d => d.category === cat).map(d => d.subcategory))];
+                subHtml += `<div class="sub-section-header">${cat}</div>`;
+                subHtml += `<div class="checkbox-group" style="margin-bottom: 10px;">`;
+                subs.forEach(s => {
+                    subHtml += `<label><input type="checkbox" name="practice-sub" value="${s}" checked> ${s}</label>`;
+                });
+                subHtml += `</div>`;
+            });
+
+            html = `
+                <div>
+                    <span style="font-size:13px; font-weight:600; color:#334155;">按主題分開選擇子主題 (可多選):</span>
+                    <div style="max-height: 250px; overflow-y: auto; padding: 5px; border: 1px solid var(--border-color); border-radius: 8px; background: #fff;">
+                        ${subHtml}
+                    </div>
+                    <div style="margin-top: 8px; display: flex; gap: 10px;">
+                        <button type="button" class="secondary-btn" style="padding: 4px 10px; font-size: 12px;" onclick="toggleAllPracticeSubCheckboxes(true)">全選</button>
+                        <button type="button" class="secondary-btn" style="padding: 4px 10px; font-size: 12px;" onclick="toggleAllPracticeSubCheckboxes(false)">全不選</button>
+                    </div>
+                </div>`;
+        } else if(source === 'custom') {
+            html = `<p style="margin:0; font-size:14px; color:#1e293b;">將使用您在「字詞表」中勾選的字詞（目前已選 <strong id="practice-custom-count">${selectedIds.size}</strong> 個）。若勾選不足請先至字詞表選取。</p>`;
+        }
+
+        if(practiceType === 'hybrid') {
+            html += `
+                <div style="margin-top:15px; padding-top:10px; border-top:1px dashed #cbd5e1; display:flex; gap:15px; flex-wrap:wrap;">
+                    <label>選擇題題數: <input type="number" id="hybrid-choice-num" value="5" min="1" max="30" style="width:80px;"></label>
+                    <label>拖曳配對題數: <input type="number" id="hybrid-drag-num" value="5" min="1" max="30" style="width:80px;"></label>
+                </div>`;
+        }
+
+        container.innerHTML = html;
+    }
+
+    function toggleAllPracticeSubCheckboxes(status) {
+        document.querySelectorAll('input[name="practice-sub"]').forEach(cb => cb.checked = status);
+    }
+
+    function generatePractice() {
+        const typeEl = document.getElementById('practice-type');
+        const dirEl = document.getElementById('practice-direction');
+        const sourceEl = document.getElementById('practice-source');
+        const container = document.getElementById('practice-container');
+        if(!typeEl || !dirEl || !sourceEl || !container) return;
+
+        const type = typeEl.value;
+        const direction = dirEl.value;
+        const source = sourceEl.value;
+        
+        container.innerHTML = '';
+        const feedbackEl = document.getElementById('practice-feedback');
+        if(feedbackEl) feedbackEl.style.display = 'none';
+
+        let pool = [];
+        if(source === 'all') {
+            pool = [...masterData];
+        } else if(source === 'category') {
+            const checkedCats = Array.from(document.querySelectorAll('input[name="practice-cat"]:checked')).map(cb => cb.value);
+            if(checkedCats.length === 0) {
+                alert('請至少勾選一個主題！');
+                return;
+            }
+            pool = masterData.filter(d => checkedCats.includes(d.category));
+        } else if(source === 'subcategory') {
+            const checkedSubs = Array.from(document.querySelectorAll('input[name="practice-sub"]:checked')).map(cb => cb.value);
+            if(checkedSubs.length === 0) {
+                alert('請至少勾選一個子主題！');
+                return;
+            }
+            pool = masterData.filter(d => checkedSubs.includes(d.subcategory));
+        } else if(source === 'custom') {
+            pool = masterData.filter(d => selectedIds.has(d.id));
+            if(pool.length === 0) {
+                alert('您尚未在字詞表中勾選任何字詞，請先返回字詞表勾選！');
+                return;
+            }
+        }
+
+        if(pool.length === 0) {
+            alert('找不到符合條件的詞彙，請調整篩選設定。');
+            return;
+        }
+
+        if(type === 'choice') {
+            let totalElem = document.getElementById('num-total');
+            let total = totalElem ? parseInt(totalElem.value) || 10 : 10;
+            pool.sort(() => 0.5 - Math.random());
+            currentQuestions = pool.slice(0, Math.min(total, pool.length));
+            renderChoiceQuestions(currentQuestions, direction);
+        } else if(type === 'drag') {
+            let totalElem = document.getElementById('num-total');
+            let total = totalElem ? parseInt(totalElem.value) || 5 : 5;
+            pool.sort(() => 0.5 - Math.random());
+            currentQuestions = pool.slice(0, Math.min(total, pool.length));
+            renderDragQuestions(currentQuestions, direction);
+        } else if(type === 'hybrid') {
+            let choiceElem = document.getElementById('hybrid-choice-num');
+            let dragElem = document.getElementById('hybrid-drag-num');
+            let choiceNum = choiceElem ? parseInt(choiceElem.value) || 5 : 5;
+            let dragNum = dragElem ? parseInt(dragElem.value) || 5 : 5;
+            pool.sort(() => 0.5 - Math.random());
+            
+            let choicePool = pool.slice(0, Math.min(choiceNum, pool.length));
+            let remainingPool = pool.slice(choicePool.length);
+            let dragPool = remainingPool.slice(0, Math.min(dragNum, remainingPool.length));
+            
+            renderHybridQuestions(choicePool, dragPool, direction);
+        }
+
+        const actionsEl = document.getElementById('practice-actions');
+        if(actionsEl) actionsEl.style.display = 'block';
+    }
+
+    function renderChoiceQuestions(items, direction, startIndex = 1) {
+        const container = document.getElementById('practice-container');
+        if(!container) return;
+        let html = startIndex === 1 ? '<h3>選擇題練習</h3>' : '';
+        
+        items.forEach((item, index) => {
+            let qIdx = startIndex + index;
+            let dir = direction === 'random' ? (Math.random() > 0.5 ? 'cn-to-en' : 'en-to-cn') : direction;
+            let promptText = (dir === 'cn-to-en') ? `${item.term}` : `${item.trans}`;
+            
+            let correctAns = (dir === 'cn-to-en') ? (item.transList[0] || item.trans) : (item.termsList[0] || item.term);
+
+            let wrongs = masterData.filter(d => d.id !== item.id).sort(() => 0.5 - Math.random()).slice(0, 3);
+            let options = [...wrongs.map(w => (dir === 'cn-to-en' ? (w.transList[0] || w.trans) : (w.termsList[0] || w.term))), correctAns];
+            options.sort(() => 0.5 - Math.random());
+
+            let mainBadgeClass = "badge-theme-main";
+            let subBadgeClass = "badge-theme-sub";
+
+            let validAnswersAttr = (dir === 'cn-to-en') ? JSON.stringify(item.transList) : JSON.stringify(item.termsList);
+
+            html += `<div class="question-card choice-card" data-valid-answers='${validAnswersAttr}' data-id="${item.id}">
+                <p>Q${qIdx}. ${promptText}</p>
+                <div style="margin-bottom: 10px; font-size: 13px; color: #64748b;">
+                    <span class="badge ${mainBadgeClass}">${item.category}</span>
+                    <span class="badge ${subBadgeClass}">${item.subcategory}</span>
+                </div>`;
+            options.forEach(opt => {
+                html += `<label style="margin-right:20px; cursor:pointer; display:inline-block; margin-bottom:8px;">
+                    <input type="radio" name="cq-${qIdx}" value="${opt}"> ${opt}
+                </label>`;
+            });
+            html += `</div>`;
+        });
+        container.insertAdjacentHTML('beforeend', html);
+    }
+
+    function renderDragQuestions(items, direction, startIndex = 1) {
+        const container = document.getElementById('practice-container');
+        if(!container) return;
+        let html = startIndex === 1 ? '<h3>拖曳配對練習</h3>' : '';
+        
+        items.forEach((item, index) => {
+            let qIdx = startIndex + index;
+            let dir = direction === 'random' ? (Math.random() > 0.5 ? 'cn-to-en' : 'en-to-cn') : direction;
+            
+            let others = masterData.filter(d => d.id !== item.id).sort(() => 0.5 - Math.random()).slice(0, 3);
+            let dragGroup = [...others, item].sort(() => 0.5 - Math.random());
+
+            let leftItems = [];
+            let rightItems = [];
+
+            dragGroup.forEach(d => {
+                let uniqueKey = d.id;
+                let lText = (dir === 'cn-to-en') ? `${d.term}` : `${d.trans}`;
+                let rText = (dir === 'cn-to-en') ? (d.transList[0] || d.trans) : (d.termsList[0] || d.term);
+                leftItems.push({ text: lText, key: uniqueKey });
+                rightItems.push({ text: rText, key: uniqueKey });
+            });
+
+            rightItems.sort(() => 0.5 - Math.random());
+            let mainBadgeClass = "badge-theme-main";
+            let subBadgeClass = "badge-theme-sub";
+
+            html += `<div class="question-card drag-group-card" style="margin-bottom:25px;" data-id="${item.id}">
+                <p>Q${qIdx}. 拖曳配對組 (${dir === 'cn-to-en' ? '中配英' : '英配中'})</p>
+                <div style="margin-bottom: 10px; font-size: 13px; color: #64748b;">
+                    <span class="badge ${mainBadgeClass}">${item.category}</span>
+                    <span class="badge ${subBadgeClass}">${item.subcategory}</span>
+                </div>
+                <div class="drag-container">
+                    <div class="drag-list">
+                        <h4 style="margin-top:0; font-size:14px; color:#475569;">來源項目</h4>`;
+            leftItems.forEach(l => {
+                html += `<div class="draggable-item" draggable="true" ondragstart="drag(event)" data-match-key="${l.key}">${l.text}</div>`;
+            });
+            html += `</div><div class="drop-list">
+                        <h4 style="margin-top:0; font-size:14px; color:#475569;">目標配對區</h4>`;
+            rightItems.forEach(r => {
+                html += `<div class="drop-target" ondragover="allowDrop(event)" ondragleave="removeHover(event)" ondrop="drop(event, '${r.key}')" data-expected-key="${r.key}">
+                    <span style="color:#64748b; font-size:13px;">${r.text}</span>
+                    <span class="dropped-placeholder" style="font-weight:600; color:var(--primary);">請將項目拖至此處</span>
+                </div>`;
+            });
+            html += `</div></div></div>`;
+        });
+
+        container.insertAdjacentHTML('beforeend', html);
+        enableDragAndDropEvents();
+    }
+
+    function renderHybridQuestions(choicePool, dragPool, direction) {
+        const container = document.getElementById('practice-container');
+        if(!container) return;
+        container.innerHTML = '<h3>混合模式練習 (選擇題 + 拖曳配對)</h3>';
+        
+        if(choicePool.length > 0) {
+            renderChoiceQuestions(choicePool, direction, 1);
+        }
+        if(dragPool.length > 0) {
+            renderDragQuestions(dragPool, direction, choicePool.length + 1);
+        }
+    }
+
+    function enableDragAndDropEvents() {
+        const draggables = document.querySelectorAll('.draggable-item');
+        draggables.forEach(item => {
+            item.addEventListener('dragstart', e => {
+                e.dataTransfer.setData('text/plain', e.target.innerText);
+                e.dataTransfer.setData('match-key', e.target.getAttribute('data-match-key'));
+            });
+        });
+
+        const targets = document.querySelectorAll('.drop-target');
+        targets.forEach(target => {
+            target.addEventListener('dragover', e => {
+                e.preventDefault();
+                target.classList.add('hovered');
+            });
+            target.addEventListener('dragleave', e => {
+                target.classList.remove('hovered');
+            });
+        });
+    }
+
+    function allowDrop(e) { e.preventDefault(); }
+    function removeHover(e) { e.currentTarget.classList.remove('hovered'); }
+    
+    function drag(e) {
+        e.dataTransfer.setData('text/plain', e.target.innerText);
+        e.dataTransfer.setData('match-key', e.target.getAttribute('data-match-key'));
+    }
+
+    function drop(e, expectedKey) {
+        e.preventDefault();
+        const target = e.currentTarget;
+        target.classList.remove('hovered');
+        const text = e.dataTransfer.getData('text/plain');
+        const matchKey = e.dataTransfer.getData('match-key');
+
+        let placeholder = target.querySelector('.dropped-placeholder');
+        if(placeholder) placeholder.remove();
+
+        let existing = target.querySelector('.dropped-item');
+        if(existing) existing.remove();
+
+        let span = document.createElement('span');
+        span.className = 'dropped-item';
+        span.style.background = '#e0e7ff';
+        span.style.padding = '4px 8px';
+        span.style.borderRadius = '4px';
+        span.style.fontWeight = '600';
+        span.style.color = '#312e81';
+        span.innerText = text;
+        span.setAttribute('data-matched-key', matchKey);
+
+        target.appendChild(span);
+    }
+
+    function checkPracticeAnswers() {
+        let score = 0;
+        let total = 0;
+
+        const choiceCards = document.querySelectorAll('.choice-card');
+        choiceCards.forEach((card) => {
+            total++;
+            let radios = card.querySelectorAll('input[type="radio"]');
+            let selectedVal = null;
+            radios.forEach(r => { if(r.checked) selectedVal = r.value; });
+            
+            let validAnswers = JSON.parse(card.getAttribute('data-valid-answers'));
+            let id = parseInt(card.getAttribute('data-id'));
+            let itemData = masterData.find(d => d.id === id);
+
+            let isCorrect = selectedVal && validAnswers.some(ans => String(ans).toLowerCase() === String(selectedVal).toLowerCase());
+
+            if(isCorrect) {
+                score++;
+                card.style.borderLeftColor = 'var(--success)';
+            } else {
+                card.style.borderLeftColor = 'var(--danger)';
+                addToWrongBook(itemData, '互動練習');
+            }
+        });
+
+        const dragGroups = document.querySelectorAll('.drag-group-card');
+        dragGroups.forEach(group => {
+            const targets = group.querySelectorAll('.drop-target');
+            targets.forEach(t => {
+                total++;
+                let expectedKey = parseInt(t.getAttribute('data-expected-key'));
+                let droppedSpan = t.querySelector('.dropped-item');
+                let matchedKey = droppedSpan ? parseInt(droppedSpan.getAttribute('data-matched-key')) : null;
+                let itemData = masterData.find(d => d.id === expectedKey);
+
+                if(matchedKey && matchedKey === expectedKey) {
+                    score++;
+                    t.style.borderColor = 'var(--success)';
+                    t.style.background = '#f0fdf4';
+                } else {
+                    t.style.borderColor = 'var(--danger)';
+                    t.style.background = '#fef2f2';
+                    addToWrongBook(itemData, '互動練習');
+                }
+            });
+        });
+
+        const feedback = document.getElementById('practice-feedback');
+        if(feedback) {
+            feedback.style.display = 'block';
+            feedback.innerHTML = `批改完成！總得分：<strong>${score} / ${total}</strong> (${total > 0 ? Math.round(score/total*100) : 0}%)。錯題已自動收錄至「錯題簿」中。`;
+        }
+    }
+
+    function toggleDictationRangeConfig() {
+        const rangeEl = document.getElementById('dictation-range');
+        const container = document.getElementById('dictation-detail-container');
+        if(!rangeEl || !container) return;
+
+        const range = rangeEl.value;
+        let html = '';
+        if(range === 'category') {
+            html = `
+                <div>
+                    <span style="font-size:13px; font-weight:600; color:#334155;">選擇主題:</span>
+                    <div class="checkbox-group">
+                        <label><input type="checkbox" name="dict-cat" value="Theme 1" checked> Theme 1</label>
+                        <label><input type="checkbox" name="dict-cat" value="Theme 2" checked> Theme 2</label>
+                        <label><input type="checkbox" name="dict-cat" value="Theme 3" checked> Theme 3</label>
+                        <label><input type="checkbox" name="dict-cat" value="Theme 4" checked> Theme 4</label>
+                    </div>
+                </div>`;
+        } else if(range === 'subcategory') {
+            let cats = [...new Set(masterData.map(d => d.category))];
+            let subHtml = '';
+            cats.forEach(cat => {
+                let subs = [...new Set(masterData.filter(d => d.category === cat).map(d => d.subcategory))];
+                subHtml += `<div class="sub-section-header">${cat}</div>`;
+                subHtml += `<div class="checkbox-group" style="margin-bottom: 10px;">`;
+                subs.forEach(s => {
+                    subHtml += `<label><input type="checkbox" name="dict-sub" value="${s}" checked> ${s}</label>`;
+                });
+                subHtml += `</div>`;
+            });
+
+            html = `
+                <div>
+                    <span style="font-size:13px; font-weight:600; color:#334155;">按主題分開選擇子主題:</span>
+                    <div style="max-height: 250px; overflow-y: auto; padding: 5px; border: 1px solid var(--border-color); border-radius: 8px; background: #fff;">
+                        ${subHtml}
+                    </div>
+                    <div style="margin-top: 8px; display: flex; gap: 10px;">
+                        <button type="button" class="secondary-btn" style="padding: 4px 10px; font-size: 12px;" onclick="toggleAllSubCheckboxes(true)">全選</button>
+                        <button type="button" class="secondary-btn" style="padding: 4px 10px; font-size: 12px;" onclick="toggleAllSubCheckboxes(false)">全不選</button>
+                    </div>
+                </div>`;
+        } else if(range === 'custom') {
+            html = `<p style="margin:0; font-size:14px; color:#1e293b;">將使用您在「字詞表」中勾選的字詞（目前已選 <strong>${selectedIds.size}</strong> 個）。</p>`;
+        }
+        container.innerHTML = html;
+    }
+
+    function toggleAllSubCheckboxes(status) {
+        document.querySelectorAll('input[name="dict-sub"]').forEach(cb => cb.checked = status);
+    }
+
+    function toggleDictationModeConfig() {
+        const modeEl = document.getElementById('dictation-mode-type');
+        const hybridConfig = document.getElementById('dictation-hybrid-config');
+        if(!modeEl || !hybridConfig) return;
+
+        const mode = modeEl.value;
+        if(mode === 'hybrid') {
+            hybridConfig.style.display = 'block';
+            updateHybridAutoBalance();
+        } else {
+            hybridConfig.style.display = 'none';
+        }
+    }
+
+    function toggleHybridSubConfig() {
+        const subValRadio = document.querySelector('input[name="hybrid-mode-sub"]:checked');
+        const manualInputs = document.getElementById('hybrid-manual-inputs');
+        if(!subValRadio || !manualInputs) return;
+
+        if(subValRadio.value === 'manual') {
+            manualInputs.style.display = 'flex';
+            updateHybridAutoBalance();
+        } else {
+            manualInputs.style.display = 'none';
+        }
+    }
+
+    function updateHybridAutoBalance() {
+        const countEl = document.getElementById('dictation-count');
+        const cnInput = document.getElementById('hybrid-cn-num');
+        const enInput = document.getElementById('hybrid-en-num');
+        if(!countEl || !cnInput || !enInput) return;
+
+        const totalCount = parseInt(countEl.value) || 10;
+        let cnVal = parseInt(cnInput.value) || 0;
+        if(cnVal > totalCount) cnVal = totalCount;
+        if(cnVal < 0) cnVal = 0;
+        
+        cnInput.value = cnVal;
+        enInput.value = totalCount - cnVal;
+    }
+
+    function initDictation() {
+        const modeEl = document.getElementById('dictation-mode-type');
+        const rangeEl = document.getElementById('dictation-range');
+        const countEl = document.getElementById('dictation-count');
+        const resEl = document.getElementById('dictation-result');
+        if(!modeEl || !rangeEl || !countEl) return;
+
+        const mode = modeEl.value;
+        const range = rangeEl.value;
+        const countInput = parseInt(countEl.value) || 10;
+        if(resEl) resEl.style.display = 'none';
+
+        let pool = [];
+        if(range === 'all') {
+            pool = [...masterData];
+        } else if(range === 'category') {
+            const checkedCats = Array.from(document.querySelectorAll('input[name="dict-cat"]:checked')).map(cb => cb.value);
+            if(checkedCats.length === 0) {
+                alert('請至少勾選一個主分類！');
+                return;
+            }
+            pool = masterData.filter(d => checkedCats.includes(d.category));
+        } else if(range === 'subcategory') {
+            const checkedSubs = Array.from(document.querySelectorAll('input[name="dict-sub"]:checked')).map(cb => cb.value);
+            if(checkedSubs.length === 0) {
+                alert('請至少勾選一個子分類！');
+                return;
+            }
+            pool = masterData.filter(d => checkedSubs.includes(d.subcategory));
+        } else if(range === 'custom') {
+            pool = masterData.filter(d => selectedIds.has(d.id));
+            if(pool.length === 0) {
+                alert('您尚未在字詞表中勾選任何字詞，請先至字詞表勾選或切換其他範圍！');
+                return;
+            }
+        }
+
+        if(pool.length === 0) {
+            alert('找不到符合此條件的詞彙，請重新選擇。');
+            return;
+        }
+
+        pool.sort(() => 0.5 - Math.random());
+        let selectedPool = pool.slice(0, Math.min(countInput, pool.length));
+
+        currentDictationItems = [];
+        if(mode === 'cn-to-en' || mode === 'en-to-cn') {
+            selectedPool.forEach(item => {
+                currentDictationItems.push({ item: item, dir: mode });
+            });
+        } else {
+            const subValRadio = document.querySelector('input[name="hybrid-mode-sub"]:checked');
+            let subVal = subValRadio ? subValRadio.value : 'random';
+            if(subVal === 'random') {
+                selectedPool.forEach(item => {
+                    let d = Math.random() > 0.5 ? 'cn-to-en' : 'en-to-cn';
+                    currentDictationItems.push({ item: item, dir: d });
+                });
+            } else {
+                let cnElem = document.getElementById('hybrid-cn-num');
+                let enElem = document.getElementById('hybrid-en-num');
+                let cnNum = cnElem ? parseInt(cnElem.value) || 0 : 0;
+                let enNum = enElem ? parseInt(enElem.value) || 0 : 0;
+                
+                if(cnNum > selectedPool.length) cnNum = selectedPool.length;
+                enNum = selectedPool.length - cnNum;
+
+                selectedPool.forEach((item, idx) => {
+                    let d = idx < cnNum ? 'cn-to-en' : 'en-to-cn';
+                    currentDictationItems.push({ item: item, dir: d });
+                });
+                currentDictationItems.sort(() => 0.5 - Math.random());
+            }
+        }
+
+        renderDictationTable();
+    }
+
+    function randomizeDictationItems() {
+        currentDictationItems.sort(() => 0.5 - Math.random());
+        renderDictationTable();
+    }
+
+    function renderDictationTable() {
+        const container = document.getElementById('dictation-container');
+        if(!container) return;
+
+        let html = `<div style="margin-bottom: 15px;">
+            <button class="secondary-btn" style="padding: 6px 14px; font-size: 13px;" onclick="randomizeDictationItems()">🔀 隨機排序現有題目</button>
+        </div>`;
+
+        html += `<table><thead><tr><th>編號</th><th>問題</th><th>請填寫答案 (Answer)</th></tr></thead><tbody>`;
+        currentDictationItems.forEach((entry, index) => {
+            let item = entry.item;
+            let mainBadgeClass = "badge-theme-main";
+            let subBadgeClass = "badge-theme-sub";
+
+            let promptText = "";
+            if(entry.dir === 'cn-to-en') {
+                promptText = `<strong>${item.term}</strong><br><span class="badge ${mainBadgeClass}">${item.category}</span> <span class="badge ${subBadgeClass}">${item.subcategory}</span>`;
+            } else {
+                promptText = `<strong>${item.trans}</strong><br><span class="badge ${mainBadgeClass}">${item.category}</span> <span class="badge ${subBadgeClass}">${item.subcategory}</span>`;
+            }
+
+            html += `<tr>
+                <td style="width:60px;">${index + 1}</td>
+                <td>${promptText}</td>
+                <td><input type="text" class="dictation-input" id="dict-input-${index}" data-id="${item.id}"></td>
+            </tr>`;
+        });
+        html += `</tbody></table>`;
+        container.innerHTML = html;
+        const actionsEl = document.getElementById('dictation-actions');
+        if(actionsEl) actionsEl.style.display = 'block';
+    }
+
+    function checkDictation() {
+        let score = 0;
+        currentDictationItems.forEach((entry, index) => {
+            let item = entry.item;
+            let dir = entry.dir;
+            let inputElem = document.getElementById(`dict-input-${index}`);
+            if(!inputElem) return;
+
+            let userVal = inputElem.value.trim();
+            let validList = (dir === 'cn-to-en') ? item.transList : item.termsList;
+
+            let isCorrect = validList.some(validAns => {
+                if (dir === 'cn-to-en') {
+                    return userVal.toLowerCase() === String(validAns).toLowerCase();
+                } else {
+                    return userVal === String(validAns);
+                }
+            });
+
+            if(isCorrect) {
+                score++;
+                inputElem.style.borderColor = 'var(--success)';
+                inputElem.style.background = '#f0fdf4';
+            } else {
+                inputElem.style.borderColor = 'var(--danger)';
+                inputElem.style.background = '#fef2f2';
+                inputElem.title = `正確答案之一：${validList.join(' 或 ')}`;
+                addToWrongBook(item, '默書模式');
+            }
+        });
+
+        const res = document.getElementById('dictation-result');
+        if(res) {
+            res.style.display = 'block';
+            res.innerHTML = `默書批改結果：<strong>${score} / ${currentDictationItems.length}</strong> 分。答錯的項目已記錄至錯題簿。`;
+        }
+    }
+
+    function addToWrongBook(itemData, sourceMode) {
+        if(!itemData) return;
+        let exists = wrongBook.some(w => w.item.id === itemData.id && w.source === sourceMode);
+        if(!exists) {
+            wrongBook.push({ item: itemData, source: sourceMode });
+        }
+        const wcEl = document.getElementById('wrong-count');
+        if(wcEl) wcEl.innerText = wrongBook.length;
+    }
+
+    function renderWrongBook() {
+        const tbody = document.getElementById('wrong-table-body');
+        const wcEl = document.getElementById('wrong-count');
+        if(!tbody) return;
+        tbody.innerHTML = '';
+        if(wcEl) wcEl.innerText = wrongBook.length;
+
+        if(wrongBook.length === 0) {
+            tbody.innerHTML = `<tr><td colspan="7" style="text-align:center; color:#64748b;">目前沒有錯題記錄，太棒了！繼續保持！</td></tr>`;
+            return;
+        }
+
+        wrongBook.forEach((entry, idx) => {
+            const item = entry.item;
+            let mainBadgeClass = "badge-theme-main";
+            let subBadgeClass = "badge-theme-sub";
+
+            const tr = document.createElement('tr');
+            tr.innerHTML = `
+                <td>${idx + 1}</td>
+                <td><span class="badge ${mainBadgeClass}">${item.category}</span></td>
+                <td><span class="badge ${subBadgeClass}">${item.subcategory}</span></td>
+                <td><strong>${item.term}</strong></td>
+                <td>${item.trans}</td>
+                <td><span class="badge badge-sub-neutral">${entry.source}</span></td>
+                <td><button class="secondary-btn" style="padding:4px 8px; font-size:12px;" onclick="removeWrongItem(${idx})">移除</button></td>
+            `;
+            tbody.appendChild(tr);
+        });
+    }
+
+    function removeWrongItem(index) {
+        wrongBook.splice(index, 1);
+        renderWrongBook();
+    }
+
+    function clearWrongBook() {
+        if(confirm('確定要清空所有錯題記錄嗎？')) {
+            wrongBook = [];
+            renderWrongBook();
+        }
+    }
+
+    function exportWrongWords(type) {
+        if(wrongBook.length === 0) {
+            alert('目前沒有錯題可供匯出！');
+            return;
+        }
+
+        if(type === 'word') {
+            let htmlContent = `<html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:w="urn:schemas-microsoft-com:office:word" xmlns="http://www.w3.org/1999/xhtml">
+            <head><meta charset="utf-8"><title>錯題清單</title></head>
+            <body style="font-family: 'Microsoft JhengHei', Arial;">
+                <h2 style="text-align:center; color:#1e1b4b;">GCE 自習系統 - 錯題複習清單</h2>
+                <table border="1" cellspacing="0" cellpadding="8" style="width:100%; border-collapse:collapse; border-color:#cbd5e1;">
+                    <tr style="background:#f1f5f9;">
+                        <th>編號</th><th>主題</th><th>子主題</th><th>中文詞彙 / 短語</th><th>英文翻譯</th><th>錯誤來源</th>
+                    </tr>`;
+            
+            wrongBook.forEach((entry, i) => {
+                htmlContent += `<tr>
+                    <td>${i + 1}</td>
+                    <td>${entry.item.category}</td>
+                    <td>${entry.item.subcategory}</td>
+                    <td>${entry.item.term}</td>
+                    <td>${entry.item.trans}</td>
+                    <td>${entry.source}</td>
+                </tr>`;
+            });
+            htmlContent += `</table></body></html>`;
+
+            let blob = new Blob(['\ufeff' + htmlContent], { type: 'application/msword' });
+            let url = URL.createObjectURL(blob);
+            let a = document.createElement('a');
+            a.href = url;
+            a.download = `GCE_中文錯題簿_${new Date().toISOString().slice(0,10)}.doc`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+        } else if(type === 'excel') {
+            let csvContent = "\uFEFF編號,主題,子主題,中文詞彙,英文翻譯,錯誤來源\n";
+            wrongBook.forEach((entry, i) => {
+                let row = [
+                    i + 1,
+                    `"${entry.item.category}"`,
+                    `"${entry.item.subcategory}"`,
+                    `"${entry.item.term}"`,
+                    `"${entry.item.trans}"`,
+                    `"${entry.source}"`
+                ];
+                csvContent += row.join(",") + "\n";
+            });
+
+            let blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+            let url = URL.createObjectURL(blob);
+            let a = document.createElement('a');
+            a.href = url;
+            a.download = `GCE_中文錯題簿_${new Date().toISOString().slice(0,10)}.csv`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+        }
+    }
+</script>
+
+</body>
+</html>
