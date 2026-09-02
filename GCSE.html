@@ -1494,11 +1494,19 @@
         let rawTerm = item[3] !== undefined ? item[3] : (item[2] !== undefined ? item[2] : "");
         let rawTrans = item[4] !== undefined ? item[4] : (item[3] !== undefined ? item[3] : "");
 
+        let rawSub = item[1] || "";
+        let formattedSub = rawSub;
+        if (shortCat === "Section 1") {
+            formattedSub = rawSub.replace(/^(\d+)\.\s*/, "1.$1 ");
+        } else {
+            formattedSub = rawSub.replace(/^(\d+)\.\s*/, "2.$1 ");
+        }
+
         masterData.push({
             id: index + 1,
             category: item[0] || "",
             shortCategory: shortCat,
-            subcategory: item[1] || "",
+            subcategory: formattedSub,
             seq: item[2] || 0,
             term: rawTerm,
             trans: rawTrans,
