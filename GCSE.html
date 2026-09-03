@@ -603,7 +603,8 @@
                         <input type="radio" name="hybrid-mode-sub" value="manual" onchange="toggleHybridSubConfig()"> 自訂題數比例
                     </label>
                 </div>
-                <div id="hybrid-manual-inputs" style="display:none; margin-top: 10px; display: flex; gap: 15px; flex-wrap: wrap;">
+                <!-- 只有當選擇自訂題數比例時才會動態顯示 -->
+                <div id="hybrid-manual-inputs" style="display:none; margin-top: 10px; gap: 15px; flex-wrap: wrap; align-items: center;">
                     <label>中譯英題數: <input type="number" id="hybrid-cn-num" value="5" min="0" max="50" style="width:80px;" oninput="updateHybridAutoBalance()"></label>
                     <label>英譯中題數 (自動計算): <input type="number" id="hybrid-en-num" value="5" readonly style="width:80px; background:#f1f5f9;"></label>
                 </div>
@@ -612,8 +613,10 @@
             <div id="dictation-detail-container" style="margin-top: 15px; padding-top: 15px; border-top: 1px dashed var(--border-color);">
             </div>
 
-            <div style="margin-top: 20px; display: flex; gap: 15px; align-items: center;">
+            <div style="margin-top: 20px; display: flex; gap: 15px; align-items: center; flex-wrap: wrap;">
                 <button class="action-btn" onclick="initDictation()">開始默書</button>
+                <!-- 默書範圍一鍵全選功能按鈕 -->
+                <button type="button" class="secondary-btn" onclick="selectAllDictationRange()">✨ 將此範圍全部納入默書範圍</button>
             </div>
         </div>
         
@@ -2114,6 +2117,52 @@
         
         cnInput.value = cnVal;
         enInput.value = totalCount - cnVal;
+    }
+
+    // 1. 默書範圍一鍵全選功能實作
+    function selectAllDictationRange() {
+        const rangeEl = document.getElementById('dictation-range');
+        if (!rangeEl) return;
+        const range = rangeEl.value;
+        
+        let matchedPool = [];
+        if (range === 'all') {
+            matchedPool = [...masterData];
+        } else if (range === 'category') {
+            const checkedCats = Array.from(document.querySelectorAll('input[name="dict-cat"]:checked')).map(cb => cb.value);
+            if (checkedCats.length === 0) {
+                alert('請至少勾選一個主分類！');
+                return;
+            }
+            matchedPool = masterData.filter(d => checkedCats.includes(d.category));
+        } else if (range === 'subcategory') {
+            const checkedSubs = Array.from(document.querySelectorAll('input[name="dict-sub"]:checked')).map(cb => cb.value);
+            if (checkedSubs.length === 0) {
+                alert('請至少勾選一個子分類！');
+                return;
+            }
+            matchedPool = masterData.filter(d => checkedSubs.includes(d.subcategory));
+        } else if (range === 'custom') {
+            matchedPool = masterData.filter(d => selectedIds.has(d.id));
+        }
+
+        if (matchedPool.length === 0) {
+            alert('當前選擇範圍內沒有找到詞彙！');
+            return;
+        }
+
+        // 將該範圍的所有 ID 加入 selectedIds，同時保留修改「默書總題數」的彈性
+        matchedPool.forEach(d => selectedIds.add(d.id));
+        updateSelectedCount();
+        
+        // 自動將「默書總題數」更新為該範圍的總字詞數，保留用家後續手動修改的彈性
+        const countEl = document.getElementById('dictation-count');
+        if (countEl) {
+            countEl.value = matchedPool.length;
+            updateHybridAutoBalance();
+        }
+
+        alert(`已成功將範圍內的 ${matchedPool.length} 個詞彙全數納入默書範圍！您可隨時調整總題數或點擊「開始默書」。`);
     }
 
     function initDictation() {
