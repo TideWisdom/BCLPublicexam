@@ -585,6 +585,11 @@
                 </label>
             </div>
 
+            <div style="margin-top: 10px; display: flex; align-items: center; gap: 10px;">
+                <button type="button" class="secondary-btn" style="padding: 6px 14px; font-size: 13px;" onclick="selectAllDictationRange()">⚡ 一鍵全選此範圍全部詞彙</button>
+                <span id="dictation-range-info" style="font-size: 13px; color: #64748b;"></span>
+            </div>
+
             <div id="dictation-hybrid-config" style="display:none; margin-top: 15px; padding-top: 15px; border-top: 1px dashed var(--border-color);">
                 <span style="font-size:13px; font-weight:600; color:#334155;">混合方向分配方式：</span>
                 <div style="display:flex; gap:15px; flex-wrap:wrap; margin-top: 8px;">
@@ -1873,10 +1878,57 @@
             html = `<p style="margin:0; font-size:14px; color:#1e293b;">將使用您在「字詞表」中勾選的字詞（目前已選 <strong>${selectedIds.size}</strong> 個）。</p>`;
         }
         container.innerHTML = html;
+        updateDictationRangeCountInfo();
     }
 
     function toggleAllSubCheckboxes(status) {
         document.querySelectorAll('input[name="dict-sub"]').forEach(cb => cb.checked = status);
+        updateDictationRangeCountInfo();
+    }
+
+    function getSelectedDictationPool() {
+        const rangeEl = document.getElementById('dictation-range');
+        if(!rangeEl) return [];
+        const range = rangeEl.value;
+        let pool = [];
+
+        if(range === 'all') {
+            pool = [...masterData];
+        } else if(range === 'category') {
+            const checkedCats = Array.from(document.querySelectorAll('input[name="dict-cat"]:checked')).map(cb => cb.value);
+            pool = masterData.filter(d => checkedCats.includes(d.category));
+        } else if(range === 'subcategory') {
+            const checkedSubs = Array.from(document.querySelectorAll('input[name="dict-sub"]:checked')).map(cb => cb.value);
+            pool = masterData.filter(d => checkedSubs.includes(d.subcategory));
+        } else if(range === 'custom') {
+            pool = masterData.filter(d => selectedIds.has(d.id));
+        }
+        return pool;
+    }
+
+    function updateDictationRangeCountInfo() {
+        const infoEl = document.getElementById('dictation-range-info');
+        const countInput = document.getElementById('dictation-count');
+        if(!infoEl || !countInput) return;
+
+        let pool = getSelectedDictationPool();
+        infoEl.innerText = `（此範圍共有 ${pool.length} 個詞彙可供默書）`;
+    }
+
+    function selectAllDictationRange() {
+        let pool = getSelectedDictationPool();
+        const countInput = document.getElementById('dictation-count');
+        if(!countInput) return;
+
+        if(pool.length === 0) {
+            alert('當前範圍沒有可用的詞彙！');
+            return;
+        }
+
+        countInput.value = pool.length;
+        updateHybridAutoBalance();
+        updateDictationRangeCountInfo();
+        alert(`已成功將默書總題數自動調整為當前範圍的全部詞彙數量共 ${pool.length} 題！`);
     }
 
     function toggleDictationModeConfig() {
@@ -1910,54 +1962,38 @@
         const countEl = document.getElementById('dictation-count');
         const cnInput = document.getElementById('hybrid-cn-num');
         const enInput = document.getElementById('hybrid-en-num');
+        const subValRadio = document.querySelector('input[name="hybrid-mode-sub"]:checked');
+        
         if(!countEl || !cnInput || !enInput) return;
 
         const totalCount = parseInt(countEl.value) || 10;
-        let cnVal = parseInt(cnInput.value) || 0;
-        if(cnVal > totalCount) cnVal = totalCount;
-        if(cnVal < 0) cnVal = 0;
         
-        cnInput.value = cnVal;
-        enInput.value = totalCount - cnVal;
+        if (subValRadio && subValRadio.value === 'manual') {
+            let cnVal = parseInt(cnInput.value) || 0;
+            if(cnVal > totalCount) cnVal = totalCount;
+            if(cnVal < 0) cnVal = 0;
+            
+            cnInput.value = cnVal;
+            enInput.value = totalCount - cnVal;
+        } else {
+            let half = Math.floor(totalCount / 2);
+            cnInput.value = half;
+            enInput.value = totalCount - half;
+        }
+        updateDictationRangeCountInfo();
     }
 
     function initDictation() {
         const modeEl = document.getElementById('dictation-mode-type');
-        const rangeEl = document.getElementById('dictation-range');
         const countEl = document.getElementById('dictation-count');
         const resEl = document.getElementById('dictation-result');
-        if(!modeEl || !rangeEl || !countEl) return;
+        if(!modeEl || !countEl) return;
 
         const mode = modeEl.value;
-        const range = rangeEl.value;
         const countInput = parseInt(countEl.value) || 10;
         if(resEl) resEl.style.display = 'none';
 
-        let pool = [];
-        if(range === 'all') {
-            pool = [...masterData];
-        } else if(range === 'category') {
-            const checkedCats = Array.from(document.querySelectorAll('input[name="dict-cat"]:checked')).map(cb => cb.value);
-            if(checkedCats.length === 0) {
-                alert('請至少勾選一個主分類！');
-                return;
-            }
-            pool = masterData.filter(d => checkedCats.includes(d.category));
-        } else if(range === 'subcategory') {
-            const checkedSubs = Array.from(document.querySelectorAll('input[name="dict-sub"]:checked')).map(cb => cb.value);
-            if(checkedSubs.length === 0) {
-                alert('請至少勾選一個子分類！');
-                return;
-            }
-            pool = masterData.filter(d => checkedSubs.includes(d.subcategory));
-        } else if(range === 'custom') {
-            pool = masterData.filter(d => selectedIds.has(d.id));
-            if(pool.length === 0) {
-                alert('您尚未在字詞表中勾選任何字詞，請先至字詞表勾選或切換其他範圍！');
-                return;
-            }
-        }
-
+        let pool = getSelectedDictationPool();
         if(pool.length === 0) {
             alert('找不到符合此條件的詞彙，請重新選擇。');
             return;
@@ -1981,12 +2017,9 @@
                 });
             } else {
                 let cnElem = document.getElementById('hybrid-cn-num');
-                let enElem = document.getElementById('hybrid-en-num');
                 let cnNum = cnElem ? parseInt(cnElem.value) || 0 : 0;
-                let enNum = enElem ? parseInt(enElem.value) || 0 : 0;
                 
                 if(cnNum > selectedPool.length) cnNum = selectedPool.length;
-                enNum = selectedPool.length - cnNum;
 
                 selectedPool.forEach((item, idx) => {
                     let d = idx < cnNum ? 'cn-to-en' : 'en-to-cn';
