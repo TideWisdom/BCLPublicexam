@@ -580,9 +580,6 @@
                         <option value="custom">自選（已勾選項目） (<span id="dict-custom-count">0</span>)</option>
                     </select>
                 </label>
-                <label>默書總題數:
-                    <input type="number" id="dictation-count" value="10" min="1" max="50" oninput="updateHybridAutoBalance()">
-                </label>
             </div>
 
             <div id="dictation-hybrid-config" style="display:none; margin-top: 15px; padding-top: 15px; border-top: 1px dashed var(--border-color);">
@@ -605,10 +602,19 @@
             <div id="dictation-detail-container" style="margin-top: 15px; padding-top: 15px; border-top: 1px dashed var(--border-color);">
             </div>
 
+            <!-- 默書範圍一鍵全選功能按鈕（已移至範圍選擇設定框後、默書總題數設定框前，文字已修改並設為淺灰色） -->
+            <div style="margin: 15px 0;">
+                <button type="button" class="secondary-btn" style="background-color: #94a3b8; font-size: 13px; padding: 6px 14px;" onclick="selectAllDictationRange()">✨ 默書總題數自動調整至與範圍相同</button>
+            </div>
+
+            <div class="config-grid" style="margin-top: 15px;">
+                <label>默書總題數:
+                    <input type="number" id="dictation-count" value="10" min="1" max="50" oninput="updateHybridAutoBalance()">
+                </label>
+            </div>
+
             <div style="margin-top: 20px; display: flex; gap: 15px; align-items: center; flex-wrap: wrap;">
                 <button class="action-btn" onclick="initDictation()">開始默書</button>
-                <!-- 默書範圍一鍵全選功能按鈕 -->
-                <button type="button" class="secondary-btn" onclick="selectAllDictationRange()">✨ 將此範圍全部納入默書範圍</button>
             </div>
         </div>
         
@@ -1923,14 +1929,13 @@
             return;
         }
 
-        // 同時將此範圍內所有詞彙加入 selectedIds（確保自選清單同步）
         pool.forEach(d => selectedIds.add(d.id));
         updateSelectedCount();
 
         countInput.value = pool.length;
         updateHybridAutoBalance();
         updateDictationRangeCountInfo();
-        alert(`已成功將範圍內的 ${pool.length} 個詞彙全部納入默書範圍與自選清單，並將總題數調整為 ${pool.length} 題！`);
+        alert(`已自動調整總題數為範圍內全數 ${pool.length} 題`);
     }
 
     function toggleDictationModeConfig() {
