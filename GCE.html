@@ -585,11 +585,6 @@
                 </label>
             </div>
 
-            <div style="margin-top: 10px; display: flex; align-items: center; gap: 10px;">
-                <button type="button" class="secondary-btn" style="padding: 6px 14px; font-size: 13px;" onclick="selectAllDictationRange()">⚡ 一鍵全選此範圍全部詞彙</button>
-                <span id="dictation-range-info" style="font-size: 13px; color: #64748b;"></span>
-            </div>
-
             <div id="dictation-hybrid-config" style="display:none; margin-top: 15px; padding-top: 15px; border-top: 1px dashed var(--border-color);">
                 <span style="font-size:13px; font-weight:600; color:#334155;">混合方向分配方式：</span>
                 <div style="display:flex; gap:15px; flex-wrap:wrap; margin-top: 8px;">
@@ -600,7 +595,8 @@
                         <input type="radio" name="hybrid-mode-sub" value="manual" onchange="toggleHybridSubConfig()"> 自訂題數比例
                     </label>
                 </div>
-                <div id="hybrid-manual-inputs" style="display:none; margin-top: 10px; display: flex; gap: 15px; flex-wrap: wrap;">
+                <!-- 只有當選擇自訂題數比例時才會動態顯示 -->
+                <div id="hybrid-manual-inputs" style="display:none; margin-top: 10px; gap: 15px; flex-wrap: wrap; align-items: center;">
                     <label>中譯英題數: <input type="number" id="hybrid-cn-num" value="5" min="0" max="50" style="width:80px;" oninput="updateHybridAutoBalance()"></label>
                     <label>英譯中題數 (自動計算): <input type="number" id="hybrid-en-num" value="5" readonly style="width:80px; background:#f1f5f9;"></label>
                 </div>
@@ -609,8 +605,10 @@
             <div id="dictation-detail-container" style="margin-top: 15px; padding-top: 15px; border-top: 1px dashed var(--border-color);">
             </div>
 
-            <div style="margin-top: 20px; display: flex; gap: 15px; align-items: center;">
+            <div style="margin-top: 20px; display: flex; gap: 15px; align-items: center; flex-wrap: wrap;">
                 <button class="action-btn" onclick="initDictation()">開始默書</button>
+                <!-- 默書範圍一鍵全選功能按鈕 -->
+                <button type="button" class="secondary-btn" onclick="selectAllDictationRange()">✨ 將此範圍全部納入默書範圍</button>
             </div>
         </div>
         
@@ -1925,10 +1923,14 @@
             return;
         }
 
+        // 同時將此範圍內所有詞彙加入 selectedIds（確保自選清單同步）
+        pool.forEach(d => selectedIds.add(d.id));
+        updateSelectedCount();
+
         countInput.value = pool.length;
         updateHybridAutoBalance();
         updateDictationRangeCountInfo();
-        alert(`已成功將默書總題數自動調整為當前範圍的全部詞彙數量共 ${pool.length} 題！`);
+        alert(`已成功將範圍內的 ${pool.length} 個詞彙全部納入默書範圍與自選清單，並將總題數調整為 ${pool.length} 題！`);
     }
 
     function toggleDictationModeConfig() {
